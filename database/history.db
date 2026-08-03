@@ -712,4 +712,104 @@ Triggers:
     trg_ambulance_providers_updated_at BEFORE UPDATE ON ambulance_providers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
 
 
-medlink=#
+medlink=# CREATE TABLE medical_events (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     user_id UUID NOT NULL,
+medlink(#
+medlink(#     user_description TEXT NOT NULL,
+medlink(#
+medlink(#     event_location_latitude NUMERIC(9,6) NOT NULL
+medlink(#         CHECK (event_location_latitude BETWEEN -90 AND 90),
+medlink(#
+medlink(#     event_location_longitude NUMERIC(9,6) NOT NULL
+medlink(#         CHECK (event_location_longitude BETWEEN -180 AND 180),
+medlink(#
+medlink(#     severity severity_type NOT NULL,
+medlink(#
+medlink(#     event_status event_status_type NOT NULL DEFAULT 'PENDING',
+medlink(#
+medlink(#     is_emergency BOOLEAN NOT NULL DEFAULT FALSE,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_medical_events_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_medical_events_updated_at
+medlink-# BEFORE UPDATE ON medical_events
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# \d medical_events;
+                                       Table "public.medical_events"
+          Column          |           Type           | Collation | Nullable |           Default       
+--------------------------+--------------------------+-----------+----------+------------------------------
+ id                       | uuid                     |           | not null | gen_random_uuid()
+ user_id                  | uuid                     |           | not null |
+ user_description         | text                     |           | not null |
+ event_location_latitude  | numeric(9,6)             |           | not null |
+ event_location_longitude | numeric(9,6)             |           | not null |
+ severity                 | severity_type            |           | not null |
+ event_status             | event_status_type        |           | not null | 'PENDING'::event_status_type
+ is_emergency             | boolean                  |           | not null | false
+ created_at               | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at               | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "medical_events_pkey" PRIMARY KEY, btree (id)
+Check constraints:
+    "medical_events_event_location_latitude_check" CHECK (event_location_latitude >= '-90'::integer::numeric AND event_location_latitude <= 90::numeric)
+    "medical_events_event_location_longitude_check" CHECK (event_location_longitude >= '-180'::integer::numeric AND event_location_longitude <= 180::numeric)
+Foreign-key constraints:
+    "fk_medical_events_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Triggers:
+    trg_medical_events_updated_at BEFORE UPDATE ON medical_events FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# CREATE TABLE ai_responses (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     medical_event_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     summary TEXT NOT NULL,
+medlink(#
+medlink(#     possible_conditions TEXT NOT NULL,
+medlink(#
+medlink(#     tags TEXT,
+medlink(#
+medlink(#     first_aid TEXT NOT NULL,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_ai_responses_medical_event
+medlink(#         FOREIGN KEY (medical_event_id)
+medlink(#         REFERENCES medical_events(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# \d ai_responses;
+                                Table "public.ai_responses"
+       Column        |           Type           | Collation | Nullable |      Default
+---------------------+--------------------------+-----------+----------+-------------------
+ id                  | uuid                     |           | not null | gen_random_uuid()
+ medical_event_id    | uuid                     |           | not null |
+ summary             | text                     |           | not null |
+ possible_conditions | text                     |           | not null |
+ tags                | text                     |           |          |
+ first_aid           | text                     |           | not null |
+ created_at          | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "ai_responses_pkey" PRIMARY KEY, btree (id)
+    "ai_responses_medical_event_id_key" UNIQUE CONSTRAINT, btree (medical_event_id)
+Foreign-key constraints:
+    "fk_ai_responses_medical_event" FOREIGN KEY (medical_event_id) REFERENCES medical_events(id) ON DELETE CASCADE
+

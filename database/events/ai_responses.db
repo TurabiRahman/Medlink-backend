@@ -1,0 +1,34 @@
+| Column              | Type        | Reason                                  |
+| ------------------- | ----------- | --------------------------------------- |
+| id                  | UUID        | Primary Key                             |
+| medical_event_id    | UUID        | Links to the event                      |
+| summary             | TEXT        | Short AI summary                        |
+| possible_conditions | TEXT        | AI diagnosis suggestions                |
+| tags                | TEXT        | Keywords like "Cardiology", "Emergency" |
+| first_aid           | TEXT        | First-aid instructions                  |
+| created_at          | TIMESTAMPTZ | Response creation time                  |
+
+
+CREATE TABLE ai_responses (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    medical_event_id UUID NOT NULL UNIQUE,
+
+    summary TEXT NOT NULL,
+
+    possible_conditions TEXT NOT NULL,
+
+    tags TEXT,
+
+    first_aid TEXT NOT NULL,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_ai_responses_medical_event
+        FOREIGN KEY (medical_event_id)
+        REFERENCES medical_events(id)
+        ON DELETE CASCADE
+
+);
+

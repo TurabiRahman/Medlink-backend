@@ -1,0 +1,58 @@
+
+id
+
+user_id
+
+user_description
+
+event_location_latitude
+
+event_location_longitude
+
+severity
+
+event_status
+
+is_emergency
+
+created_at
+
+updated_at
+
+CREATE TABLE medical_events (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    user_id UUID NOT NULL,
+
+    user_description TEXT NOT NULL,
+
+    event_location_latitude NUMERIC(9,6) NOT NULL
+        CHECK (event_location_latitude BETWEEN -90 AND 90),
+
+    event_location_longitude NUMERIC(9,6) NOT NULL
+        CHECK (event_location_longitude BETWEEN -180 AND 180),
+
+    severity severity_type NOT NULL,
+
+    event_status event_status_type NOT NULL DEFAULT 'PENDING',
+
+    is_emergency BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_medical_events_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+
+);
+
+# Trigger 
+
+CREATE TRIGGER trg_medical_events_updated_at
+BEFORE UPDATE ON medical_events
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

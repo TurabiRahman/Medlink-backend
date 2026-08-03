@@ -336,4 +336,32 @@ $$ LANGUAGE plpgsql;
 2. 
 
 
+# Let's move into the heart
 
+User
+ │
+ │
+ │ "My father has severe chest pain."
+ │
+ ▼
+AI Analysis
+ │
+ ▼
+Medical Event Created
+ │
+ ├──────── AI Response Saved
+ │
+ ├──────── Nearby Hospitals Saved
+ │
+ ├──────── Ambulance Providers Saved
+ │
+ └──────── User Opens Event
+                │
+                ▼
+         Reserve ICU Bed
+                │
+                ▼
+          Reservation Created
+                │
+                ▼
+            Payment Generated
