@@ -1,0 +1,87 @@
+# User Table --------------
+
+id
+role_type
+
+email
+phone
+
+password_hash
+
+is_verified
+is_active
+
+last_login
+
+created_at
+updated_at
+
+CREATE TABLE users (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    role_type role_type NOT NULL,
+
+    email VARCHAR(255) NOT NULL UNIQUE,
+
+    phone VARCHAR(20) NOT NULL UNIQUE,
+
+    password_hash TEXT NOT NULL,
+
+    is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    last_login TIMESTAMPTZ,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+);
+
+# Code && Evaluation
+
+medlink=# CREATE TABLE users (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     role_type role_type NOT NULL,
+medlink(#
+medlink(#     email VARCHAR(255) NOT NULL UNIQUE,
+medlink(#
+medlink(#     phone VARCHAR(20) NOT NULL UNIQUE,
+medlink(#
+medlink(#     password_hash TEXT NOT NULL,
+medlink(#
+medlink(#     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+medlink(#
+medlink(#     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+medlink(#
+medlink(#     last_login TIMESTAMPTZ,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# \d users
+                                Table "public.users"
+    Column     |           Type           | Collation | Nullable |      Default
+---------------+--------------------------+-----------+----------+-------------------
+ id            | uuid                     |           | not null | gen_random_uuid()
+ role_type     | role_type                |           | not null |
+ email         | character varying(255)   |           | not null |
+ phone         | character varying(20)    |           | not null |
+ password_hash | text                     |           | not null |
+ is_verified   | boolean                  |           | not null | false
+ is_active     | boolean                  |           | not null | true
+ last_login    | timestamp with time zone |           |          |
+ created_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_phone_key" UNIQUE CONSTRAINT, btree (phone)
+
