@@ -1,0 +1,49 @@
+| Column      | Type            |
+| ----------- | --------------- |
+| id          | UUID            |
+| hospital_id | UUID            |
+| ward_id     | UUID            |
+| bed_number  | VARCHAR(30)     |
+| bed_status  | bed_status_type |
+| created_at  | TIMESTAMPTZ     |
+| updated_at  | TIMESTAMPTZ     |
+
+
+CREATE TABLE hospital_beds (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    hospital_id UUID NOT NULL,
+
+    ward_id UUID NOT NULL,
+
+    bed_number VARCHAR(30) NOT NULL,
+
+    bed_status bed_status_type NOT NULL DEFAULT 'AVAILABLE',
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_hospital_beds_hospital
+        FOREIGN KEY (hospital_id)
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_hospital_beds_ward
+        FOREIGN KEY (ward_id)
+        REFERENCES hospital_wards(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_hospital_bed_number
+        UNIQUE (hospital_id, bed_number)
+
+);
+
+# Trigger 
+
+CREATE TRIGGER trg_hospital_beds_updated_at
+BEFORE UPDATE ON hospital_beds
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+

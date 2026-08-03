@@ -1,0 +1,31 @@
+| Column      | Type        | Notes          |
+| ----------- | ----------- | -------------- |
+| id          | UUID        | Primary Key    |
+| hospital_id | UUID        | FK → hospitals |
+| user_id     | UUID        | FK → users     |
+| joined_at   | TIMESTAMPTZ | When assigned  |
+
+
+CREATE TABLE hospital_admins (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    hospital_id UUID NOT NULL,
+
+    user_id UUID NOT NULL UNIQUE,
+
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_hospital_admins_hospital
+        FOREIGN KEY (hospital_id)
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_hospital_admins_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+
+);
+
+# Triggers - no need

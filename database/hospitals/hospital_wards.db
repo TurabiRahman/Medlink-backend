@@ -1,0 +1,42 @@
+| Column      | Type         |
+| ----------- | ------------ |
+| id          | UUID         |
+| hospital_id | UUID         |
+| ward_name   | VARCHAR(100) |
+| description | TEXT         |
+| created_at  | TIMESTAMPTZ  |
+| updated_at  | TIMESTAMPTZ  |
+
+
+CREATE TABLE hospital_wards (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    hospital_id UUID NOT NULL,
+
+    ward_name VARCHAR(100) NOT NULL,
+
+    description TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_hospital_wards_hospital
+        FOREIGN KEY (hospital_id)
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_hospital_ward_name
+        UNIQUE (hospital_id, ward_name)
+
+);
+
+
+# Trigger 
+
+CREATE TRIGGER trg_hospital_wards_updated_at
+BEFORE UPDATE ON hospital_wards
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+

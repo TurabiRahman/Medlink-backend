@@ -1,0 +1,66 @@
+| Column                    | Type               | Why?                                               |
+| ------------------------- | ------------------ | -------------------------------------------------- |
+| id                        | UUID               | Primary Key                                        |
+| user_id                   | UUID               | One blood record per user                          |
+| blood_group               | `blood_group_type` | Uses our ENUM                                      |
+| last_donation_date        | DATE               | Latest donation                                    |
+| can_donate                | BOOLEAN            | Medically eligible                                 |
+| next_available_date       | DATE               | Next eligible donation date                        |
+| is_available_for_donation | BOOLEAN            | Whether the user wants to appear in donor searches |
+| updated_at                | TIMESTAMPTZ        | Auto updated by trigger                            |
+
+
+CREATE TABLE blood_information (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    user_id UUID NOT NULL UNIQUE,
+
+    blood_group blood_group_type NOT NULL,
+
+    last_donation_date DATE,
+
+    can_donate BOOLEAN NOT NULL DEFAULT TRUE,
+
+    next_available_date DATE,
+
+    is_available_for_donation BOOLEAN NOT NULL DEFAULT TRUE,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_blood_information_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+
+);
+
+
+# Trigger for this table 
+
+CREATE TRIGGER trg_blood_information_updated_at
+BEFORE UPDATE ON blood_information
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+# After execution
+
+medlink=# \d blood_information;
+                                Table "public.blood_information"
+          Column           |           Type           | Collation | Nullable |      Default
+---------------------------+--------------------------+-----------+----------+-------------------
+ id                        | uuid                     |           | not null | gen_random_uuid()
+ user_id                   | uuid                     |           | not null |
+ blood_group               | blood_group_type         |           | not null |
+ last_donation_date        | date                     |           |          |
+ can_donate                | boolean                  |           | not null | true
+ next_available_date       | date                     |           |          |
+ is_available_for_donation | boolean                  |           | not null | true
+ updated_at                | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "blood_information_pkey" PRIMARY KEY, btree (id)
+    "blood_information_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "fk_blood_information_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Triggers:
+    trg_blood_information_updated_at BEFORE UPDATE ON blood_information FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()

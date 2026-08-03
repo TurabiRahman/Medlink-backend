@@ -1,0 +1,84 @@
+| Column          | Type                 | Reason                            |
+| --------------- | -------------------- | --------------------------------- |
+| id              | UUID                 | Primary Key                       |
+| hospital_name   | VARCHAR(255)         | Hospital Name                     |
+| license_number  | VARCHAR(100)         | Government/Registration License   |
+| email           | VARCHAR(255)         | Official Email                    |
+| phone           | VARCHAR(20)          | Official Contact Number           |
+| website         | VARCHAR(255)         | Hospital Website                  |
+| address         | TEXT                 | Full Address                      |
+| latitude        | NUMERIC(9,6)         | GPS Latitude                      |
+| longitude       | NUMERIC(9,6)         | GPS Longitude                     |
+| hospital_status | hospital_status_type | OPEN / CLOSED / UNDER_MAINTENANCE |
+| description     | TEXT                 | About the hospital                |
+| created_at      | TIMESTAMPTZ          | Created Time                      |
+| updated_at      | TIMESTAMPTZ          | Updated Automatically             |
+
+
+CREATE TABLE hospitals (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    hospital_name VARCHAR(255) NOT NULL,
+
+    license_number VARCHAR(100) NOT NULL UNIQUE,
+
+    email VARCHAR(255) NOT NULL UNIQUE,
+
+    phone VARCHAR(20) NOT NULL UNIQUE,
+
+    website VARCHAR(255),
+
+    address TEXT NOT NULL,
+
+    latitude NUMERIC(9,6) NOT NULL
+        CHECK (latitude BETWEEN -90 AND 90),
+
+    longitude NUMERIC(9,6) NOT NULL
+        CHECK (longitude BETWEEN -180 AND 180),
+
+    hospital_status hospital_status_type NOT NULL DEFAULT 'OPEN',
+
+    description TEXT,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+);
+
+# Trigger fro this table
+
+CREATE TRIGGER trg_hospitals_updated_at
+BEFORE UPDATE ON hospitals
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+# After execution 
+
+medlink=# \d hospitals;
+                                     Table "public.hospitals"
+     Column      |           Type           | Collation | Nullable |           Default
+-----------------+--------------------------+-----------+----------+------------------------------
+ id              | uuid                     |           | not null | gen_random_uuid()
+ hospital_name   | character varying(255)   |           | not null |
+ license_number  | character varying(100)   |           | not null |
+ email           | character varying(255)   |           | not null |
+ phone           | character varying(20)    |           | not null |
+ website         | character varying(255)   |           |          |
+ address         | text                     |           | not null |
+ latitude        | numeric(9,6)             |           | not null |
+ longitude       | numeric(9,6)             |           | not null |
+ hospital_status | hospital_status_type     |           | not null | 'OPEN'::hospital_status_type
+ description     | text                     |           |          |
+ created_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "hospitals_pkey" PRIMARY KEY, btree (id)
+    "hospitals_email_key" UNIQUE CONSTRAINT, btree (email)
+    "hospitals_license_number_key" UNIQUE CONSTRAINT, btree (license_number)
+    "hospitals_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Check constraints:
+    "hospitals_latitude_check" CHECK (latitude >= '-90'::integer::numeric AND latitude <= 90::numeric)    "hospitals_longitude_check" CHECK (longitude >= '-180'::integer::numeric AND longitude <= 180::numeric)
+Triggers:
+    trg_hospitals_updated_at BEFORE UPDATE ON hospitals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()

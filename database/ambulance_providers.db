@@ -1,0 +1,72 @@
+id
+
+provider_name
+
+phone
+
+address
+
+latitude
+
+longitude
+
+is_active
+
+created_at
+
+updated_at
+
+CREATE TABLE ambulance_providers (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    provider_name VARCHAR(255) NOT NULL,
+
+    phone VARCHAR(20) NOT NULL UNIQUE,
+
+    address TEXT NOT NULL,
+
+    latitude NUMERIC(9,6) NOT NULL
+        CHECK (latitude BETWEEN -90 AND 90),
+
+    longitude NUMERIC(9,6) NOT NULL
+        CHECK (longitude BETWEEN -180 AND 180),
+
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+
+);
+
+# Trigger 
+
+CREATE TRIGGER trg_ambulance_providers_updated_at
+BEFORE UPDATE ON ambulance_providers
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+# after execution
+
+medlink=# \d ambulance_providers;
+                         Table "public.ambulance_providers"
+    Column     |           Type           | Collation | Nullable |      Default
+---------------+--------------------------+-----------+----------+-------------------
+ id            | uuid                     |           | not null | gen_random_uuid()
+ provider_name | character varying(255)   |           | not null |
+ phone         | character varying(20)    |           | not null |
+ address       | text                     |           | not null |
+ latitude      | numeric(9,6)             |           | not null |
+ longitude     | numeric(9,6)             |           | not null |
+ is_active     | boolean                  |           | not null | true
+ created_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "ambulance_providers_pkey" PRIMARY KEY, btree (id)
+    "ambulance_providers_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Check constraints:
+    "ambulance_providers_latitude_check" CHECK (latitude >= '-90'::integer::numeric AND latitude <= 90::numeric)
+    "ambulance_providers_longitude_check" CHECK (longitude >= '-180'::integer::numeric AND longitude <= 180::numeric)
+Triggers:
+    trg_ambulance_providers_updated_at BEFORE UPDATE ON ambulance_providers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()

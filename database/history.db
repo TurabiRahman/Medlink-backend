@@ -1,0 +1,715 @@
+Windows PowerShell
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Install the latest PowerShell for new features and improvements! https://aka.ms/PSWindows
+
+PS C:\Users\USERAS> psql -U postgres
+Password for user postgres:
+
+psql (18.4)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \l
+                                                                       List of databases
+      Name      |  Owner   | Encoding | Locale Provider |          Collate           |           Ctype            | Locale | ICU Rules |   Access privileges
+----------------+----------+----------+-----------------+----------------------------+----------------------------+--------+-----------+-----------------------
+ postgres       | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ project01_test | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ simvault       | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ template0      | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           | =c/postgres          +
+                |          |          |                 |                            |                            |        |           | postgres=CTc/postgres
+ template1      | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           | =c/postgres          +
+                |          |          |                 |                            |                            |        |           | postgres=CTc/postgres
+(5 rows)
+
+
+postgres=# create database medlink;
+CREATE DATABASE
+postgres=# /l
+postgres-# \l
+                                                                       List of databases
+      Name      |  Owner   | Encoding | Locale Provider |          Collate           |           Ctype            | Locale | ICU Rules |   Access privileges
+----------------+----------+----------+-----------------+----------------------------+----------------------------+--------+-----------+-----------------------
+ medlink        | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ postgres       | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ project01_test | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ simvault       | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ template0      | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           | =c/postgres          +
+                |          |          |                 |                            |                            |        |           | postgres=CTc/postgres
+ template1      | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           | =c/postgres          +
+                |          |          |                 |                            |                            |        |           | postgres=CTc/postgres
+(6 rows)
+
+
+postgres-# \dx
+                          List of installed extensions
+  Name   | Version | Default version |   Schema   |         Description
+---------+---------+-----------------+------------+------------------------------
+ plpgsql | 1.0     | 1.0             | pg_catalog | PL/pgSQL procedural language
+(1 row)
+
+
+postgres-# \q
+PS C:\Users\USERAS> psql -U postgres
+Password for user postgres:
+
+psql: error: connection to server at "localhost" (::1), port 5432 failed: FATAL:  password authentication failed for user "postgres"
+PS C:\Users\USERAS> psql -U postgres
+Password for user postgres:
+
+psql (18.4)
+WARNING: Console code page (437) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+postgres=# \l
+                                                                       List of databases
+      Name      |  Owner   | Encoding | Locale Provider |          Collate           |           Ctype            | Locale | ICU Rules |   Access privileges
+----------------+----------+----------+-----------------+----------------------------+----------------------------+--------+-----------+-----------------------
+ medlink        | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ postgres       | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ project01_test | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ simvault       | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           |
+ template0      | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           | =c/postgres          +
+                |          |          |                 |                            |                            |        |           | postgres=CTc/postgres
+ template1      | postgres | UTF8     | libc            | English_United States.1252 | English_United States.1252 |        |           | =c/postgres          +
+                |          |          |                 |                            |                            |        |           | postgres=CTc/postgres
+(6 rows)
+
+
+postgres=# \c medlink
+You are now connected to database "medlink" as user "postgres".
+medlink=# create extension if not exists pgcrypto;
+CREATE EXTENSION
+medlink=# #dx
+medlink-# ;
+ERROR:  syntax error at or near "#"
+LINE 1: #dx
+        ^
+medlink=# \dx
+                           List of installed extensions
+   Name   | Version | Default version |   Schema   |         Description
+----------+---------+-----------------+------------+------------------------------
+ pgcrypto | 1.4     | 1.4             | public     | cryptographic functions
+ plpgsql  | 1.0     | 1.0             | pg_catalog | PL/pgSQL procedural language
+(2 rows)
+
+
+medlink=# select gen_random_uuid();
+           gen_random_uuid
+--------------------------------------
+ 07484367-c84d-4975-88e6-cc0f92ed64fa
+(1 row)
+
+
+medlink=# CREATE TYPE role_type AS ENUM (
+medlink(#     'CUSTOMER',
+medlink(#     'SUPER_ADMIN',
+medlink(#     'HOSPITAL_ADMIN',
+medlink(#     'AMBULANCE_ADMIN'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE gender_type AS ENUM (
+medlink(#     'MALE',
+medlink(#     'FEMALE',
+medlink(#     'OTHER'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE blood_group_type AS ENUM (
+medlink(#     'A+',
+medlink(#     'A-',
+medlink(#     'B+',
+medlink(#     'B-',
+medlink(#     'AB+',
+medlink(#     'AB-',
+medlink(#     'O+',
+medlink(#     'O-'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE severity_type AS ENUM (
+medlink(#     'LOW',
+medlink(#     'MEDIUM',
+medlink(#     'HIGH',
+medlink(#     'CRITICAL'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE event_status_type AS ENUM (
+medlink(#     'PENDING',
+medlink(#     'COMPLETED',
+medlink(#     'CANCELLED'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE hospital_status_type AS ENUM (
+medlink(#     'OPEN',
+medlink(#     'CLOSED',
+medlink(#     'UNDER_MAINTENANCE'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE bed_status_type AS ENUM (
+medlink(#     'AVAILABLE',
+medlink(#     'OCCUPIED',
+medlink(#     'RESERVED',
+medlink(#     'MAINTENANCE'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE reservation_status_type AS ENUM (
+medlink(#     'PENDING',
+medlink(#     'APPROVED',
+medlink(#     'REJECTED',
+medlink(#     'CANCELLED',
+medlink(#     'COMPLETED'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE reservation_mode_type AS ENUM (
+medlink(#     'NORMAL',
+medlink(#     'EMERGENCY'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE payment_status_type AS ENUM (
+medlink(#     'UNPAID',
+medlink(#     'PARTIALLY_PAID',
+medlink(#     'PAID',
+medlink(#     'REFUNDED'
+medlink(# );
+CREATE TYPE
+medlink=# CREATE TYPE payment_method_type AS ENUM (
+medlink(#     'CASH',
+medlink(#     'CARD',
+medlink(#     'MOBILE_BANKING',
+medlink(#     'BANK_TRANSFER'
+medlink(# );
+CREATE TYPE
+medlink=# \dT
+               List of data types
+ Schema |          Name           | Description
+--------+-------------------------+-------------
+ public | bed_status_type         |
+ public | blood_group_type        |
+ public | event_status_type       |
+ public | gender_type             |
+ public | hospital_status_type    |
+ public | payment_method_type     |
+ public | payment_status_type     |
+ public | reservation_mode_type   |
+ public | reservation_status_type |
+ public | role_type               |
+ public | severity_type           |
+(11 rows)
+
+
+medlink=# CREATE TABLE users (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     role_type role_type NOT NULL,
+medlink(#
+medlink(#     email VARCHAR(255) NOT NULL UNIQUE,
+medlink(#
+medlink(#     phone VARCHAR(20) NOT NULL UNIQUE,
+medlink(#
+medlink(#     password_hash TEXT NOT NULL,
+medlink(#
+medlink(#     is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+medlink(#
+medlink(#     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+medlink(#
+medlink(#     last_login TIMESTAMPTZ,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# /d users
+medlink-# ;
+ERROR:  syntax error at or near "/"
+LINE 1: /d users
+        ^
+medlink=# \d users
+                                Table "public.users"
+    Column     |           Type           | Collation | Nullable |      Default
+---------------+--------------------------+-----------+----------+-------------------
+ id            | uuid                     |           | not null | gen_random_uuid()
+ role_type     | role_type                |           | not null |
+ email         | character varying(255)   |           | not null |
+ phone         | character varying(20)    |           | not null |
+ password_hash | text                     |           | not null |
+ is_verified   | boolean                  |           | not null | false
+ is_active     | boolean                  |           | not null | true
+ last_login    | timestamp with time zone |           |          |
+ created_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "users_email_key" UNIQUE CONSTRAINT, btree (email)
+    "users_phone_key" UNIQUE CONSTRAINT, btree (phone)
+
+
+medlink=# CREATE OR REPLACE FUNCTION update_updated_at_column()
+medlink-# RETURNS TRIGGER
+medlink-# AS $$
+medlink$# BEGIN
+medlink$#     NEW.updated_at = CURRENT_TIMESTAMP;
+medlink$#     RETURN NEW;
+medlink$# END;
+medlink$# $$ LANGUAGE plpgsql;
+CREATE FUNCTION
+medlink=# CREATE TRIGGER trg_users_updated_at
+medlink-# BEFORE UPDATE ON users
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# CREATE TABLE user_profiles (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     user_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     first_name VARCHAR(100) NOT NULL,
+medlink(#
+medlink(#     last_name VARCHAR(100) NOT NULL,
+medlink(#
+medlink(#     gender gender_type NOT NULL,
+medlink(#
+medlink(#     date_of_birth DATE NOT NULL,
+medlink(#
+medlink(#     national_id VARCHAR(30) UNIQUE,
+medlink(#
+medlink(#     address TEXT NOT NULL,
+medlink(#
+medlink(#     emergency_contact_name VARCHAR(200) NOT NULL,
+medlink(#
+medlink(#     emergency_contact_phone VARCHAR(20) NOT NULL,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_user_profiles_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_user_profiles_updated_at
+medlink-# BEFORE UPDATE ON user_profiles
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# \d user_profiles;
+                                 Table "public.user_profiles"
+         Column          |           Type           | Collation | Nullable |      Default
+-------------------------+--------------------------+-----------+----------+-------------------
+ id                      | uuid                     |           | not null | gen_random_uuid()
+ user_id                 | uuid                     |           | not null |
+ first_name              | character varying(100)   |           | not null |
+ last_name               | character varying(100)   |           | not null |
+ gender                  | gender_type              |           | not null |
+ date_of_birth           | date                     |           | not null |
+ national_id             | character varying(30)    |           |          |
+ address                 | text                     |           | not null |
+ emergency_contact_name  | character varying(200)   |           | not null |
+ emergency_contact_phone | character varying(20)    |           | not null |
+ created_at              | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at              | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "user_profiles_pkey" PRIMARY KEY, btree (id)
+    "user_profiles_national_id_key" UNIQUE CONSTRAINT, btree (national_id)
+    "user_profiles_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "fk_user_profiles_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Triggers:
+    trg_user_profiles_updated_at BEFORE UPDATE ON user_profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# CREATE TABLE user_locations (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     user_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     latitude NUMERIC(9,6) NOT NULL,
+medlink(#
+medlink(#     longitude NUMERIC(9,6) NOT NULL,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_user_locations_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_user_locations_updated_at
+medlink-# BEFORE UPDATE ON user_locations
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# \d user_locations;
+                          Table "public.user_locations"
+   Column   |           Type           | Collation | Nullable |      Default
+------------+--------------------------+-----------+----------+-------------------
+ id         | uuid                     |           | not null | gen_random_uuid()
+ user_id    | uuid                     |           | not null |
+ latitude   | numeric(9,6)             |           | not null |
+ longitude  | numeric(9,6)             |           | not null |
+ updated_at | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "user_locations_pkey" PRIMARY KEY, btree (id)
+    "user_locations_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "fk_user_locations_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Triggers:
+    trg_user_locations_updated_at BEFORE UPDATE ON user_locations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# CREATE TABLE blood_information (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     user_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     blood_group blood_group_type NOT NULL,
+medlink(#
+medlink(#     last_donation_date DATE,
+medlink(#
+medlink(#     can_donate BOOLEAN NOT NULL DEFAULT TRUE,
+medlink(#
+medlink(#     next_available_date DATE,
+medlink(#
+medlink(#     is_available_for_donation BOOLEAN NOT NULL DEFAULT TRUE,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_blood_information_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_blood_information_updated_at
+medlink-# BEFORE UPDATE ON blood_information
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# \d blood_information;
+                                Table "public.blood_information"
+          Column           |           Type           | Collation | Nullable |      Default
+---------------------------+--------------------------+-----------+----------+-------------------
+ id                        | uuid                     |           | not null | gen_random_uuid()
+ user_id                   | uuid                     |           | not null |
+ blood_group               | blood_group_type         |           | not null |
+ last_donation_date        | date                     |           |          |
+ can_donate                | boolean                  |           | not null | true
+ next_available_date       | date                     |           |          |
+ is_available_for_donation | boolean                  |           | not null | true
+ updated_at                | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "blood_information_pkey" PRIMARY KEY, btree (id)
+    "blood_information_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "fk_blood_information_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+Triggers:
+    trg_blood_information_updated_at BEFORE UPDATE ON blood_information FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# CREATE TABLE blood_donation_history (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     user_id UUID NOT NULL,
+medlink(#
+medlink(#     hospital_id UUID,
+medlink(#
+medlink(#     donation_date DATE NOT NULL,
+medlink(#
+medlink(#     remarks TEXT,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_blood_donation_history_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# \d blood_donation_history;
+                        Table "public.blood_donation_history"
+    Column     |           Type           | Collation | Nullable |      Default
+---------------+--------------------------+-----------+----------+-------------------
+ id            | uuid                     |           | not null | gen_random_uuid()
+ user_id       | uuid                     |           | not null |
+ hospital_id   | uuid                     |           |          |
+ donation_date | date                     |           | not null |
+ remarks       | text                     |           |          |
+ created_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "blood_donation_history_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "fk_blood_donation_history_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+
+medlink=# CREATE TABLE hospitals (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     hospital_name VARCHAR(255) NOT NULL,
+medlink(#
+medlink(#     license_number VARCHAR(100) NOT NULL UNIQUE,
+medlink(#
+medlink(#     email VARCHAR(255) NOT NULL UNIQUE,
+medlink(#
+medlink(#     phone VARCHAR(20) NOT NULL UNIQUE,
+medlink(#
+medlink(#     website VARCHAR(255),
+medlink(#
+medlink(#     address TEXT NOT NULL,
+medlink(#
+medlink(#     latitude NUMERIC(9,6) NOT NULL
+medlink(#         CHECK (latitude BETWEEN -90 AND 90),
+medlink(#
+medlink(#     longitude NUMERIC(9,6) NOT NULL
+medlink(#         CHECK (longitude BETWEEN -180 AND 180),
+medlink(#
+medlink(#     hospital_status hospital_status_type NOT NULL DEFAULT 'OPEN',
+medlink(#
+medlink(#     description TEXT,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_hospitals_updated_at
+medlink-# BEFORE UPDATE ON hospitals
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# \d hospitals;
+                                     Table "public.hospitals"
+     Column      |           Type           | Collation | Nullable |           Default
+-----------------+--------------------------+-----------+----------+------------------------------
+ id              | uuid                     |           | not null | gen_random_uuid()
+ hospital_name   | character varying(255)   |           | not null |
+ license_number  | character varying(100)   |           | not null |
+ email           | character varying(255)   |           | not null |
+ phone           | character varying(20)    |           | not null |
+ website         | character varying(255)   |           |          |
+ address         | text                     |           | not null |
+ latitude        | numeric(9,6)             |           | not null |
+ longitude       | numeric(9,6)             |           | not null |
+ hospital_status | hospital_status_type     |           | not null | 'OPEN'::hospital_status_type
+ description     | text                     |           |          |
+ created_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at      | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "hospitals_pkey" PRIMARY KEY, btree (id)
+    "hospitals_email_key" UNIQUE CONSTRAINT, btree (email)
+    "hospitals_license_number_key" UNIQUE CONSTRAINT, btree (license_number)
+    "hospitals_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Check constraints:
+    "hospitals_latitude_check" CHECK (latitude >= '-90'::integer::numeric AND latitude <= 90::numeric)    "hospitals_longitude_check" CHECK (longitude >= '-180'::integer::numeric AND longitude <= 180::numeric)
+Triggers:
+    trg_hospitals_updated_at BEFORE UPDATE ON hospitals FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# CREATE TABLE hospital_admins (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     hospital_id UUID NOT NULL,
+medlink(#
+medlink(#     user_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     joined_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_hospital_admins_hospital
+medlink(#         FOREIGN KEY (hospital_id)
+medlink(#         REFERENCES hospitals(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_hospital_admins_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TABLE hospital_wards (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     hospital_id UUID NOT NULL,
+medlink(#
+medlink(#     ward_name VARCHAR(100) NOT NULL,
+medlink(#
+medlink(#     description TEXT,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_hospital_wards_hospital
+medlink(#         FOREIGN KEY (hospital_id)
+medlink(#         REFERENCES hospitals(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT uq_hospital_ward_name
+medlink(#         UNIQUE (hospital_id, ward_name)
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_hospital_wards_updated_at
+medlink-# BEFORE UPDATE ON hospital_wards
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# CREATE TABLE hospital_beds (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     hospital_id UUID NOT NULL,
+medlink(#
+medlink(#     ward_id UUID NOT NULL,
+medlink(#
+medlink(#     bed_number VARCHAR(30) NOT NULL,
+medlink(#
+medlink(#     bed_status bed_status_type NOT NULL DEFAULT 'AVAILABLE',
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_hospital_beds_hospital
+medlink(#         FOREIGN KEY (hospital_id)
+medlink(#         REFERENCES hospitals(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_hospital_beds_ward
+medlink(#         FOREIGN KEY (ward_id)
+medlink(#         REFERENCES hospital_wards(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT uq_hospital_bed_number
+medlink(#         UNIQUE (hospital_id, bed_number)
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# \d hospital_admins;
+                          Table "public.hospital_admins"
+   Column    |           Type           | Collation | Nullable |      Default
+-------------+--------------------------+-----------+----------+-------------------
+ id          | uuid                     |           | not null | gen_random_uuid()
+ hospital_id | uuid                     |           | not null |
+ user_id     | uuid                     |           | not null |
+ joined_at   | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "hospital_admins_pkey" PRIMARY KEY, btree (id)
+    "hospital_admins_user_id_key" UNIQUE CONSTRAINT, btree (user_id)
+Foreign-key constraints:
+    "fk_hospital_admins_hospital" FOREIGN KEY (hospital_id) REFERENCES hospitals(id) ON DELETE CASCADE    "fk_hospital_admins_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+
+
+medlink=# \d hospital_wards;
+                           Table "public.hospital_wards"
+   Column    |           Type           | Collation | Nullable |      Default
+-------------+--------------------------+-----------+----------+-------------------
+ id          | uuid                     |           | not null | gen_random_uuid()
+ hospital_id | uuid                     |           | not null |
+ ward_name   | character varying(100)   |           | not null |
+ description | text                     |           |          |
+ created_at  | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at  | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "hospital_wards_pkey" PRIMARY KEY, btree (id)
+    "uq_hospital_ward_name" UNIQUE CONSTRAINT, btree (hospital_id, ward_name)
+Foreign-key constraints:
+    "fk_hospital_wards_hospital" FOREIGN KEY (hospital_id) REFERENCES hospitals(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "hospital_beds" CONSTRAINT "fk_hospital_beds_ward" FOREIGN KEY (ward_id) REFERENCES hospital_wards(id) ON DELETE CASCADE
+Triggers:
+    trg_hospital_wards_updated_at BEFORE UPDATE ON hospital_wards FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# \d hospital_beds;
+                                 Table "public.hospital_beds"
+   Column    |           Type           | Collation | Nullable |           Default
+-------------+--------------------------+-----------+----------+------------------------------
+ id          | uuid                     |           | not null | gen_random_uuid()
+ hospital_id | uuid                     |           | not null |
+ ward_id     | uuid                     |           | not null |
+ bed_number  | character varying(30)    |           | not null |
+ bed_status  | bed_status_type          |           | not null | 'AVAILABLE'::bed_status_type
+ created_at  | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at  | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "hospital_beds_pkey" PRIMARY KEY, btree (id)
+    "uq_hospital_bed_number" UNIQUE CONSTRAINT, btree (hospital_id, bed_number)
+Foreign-key constraints:
+    "fk_hospital_beds_hospital" FOREIGN KEY (hospital_id) REFERENCES hospitals(id) ON DELETE CASCADE
+    "fk_hospital_beds_ward" FOREIGN KEY (ward_id) REFERENCES hospital_wards(id) ON DELETE CASCADE
+
+
+medlink=# CREATE TABLE ambulance_providers (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     provider_name VARCHAR(255) NOT NULL,
+medlink(#
+medlink(#     phone VARCHAR(20) NOT NULL UNIQUE,
+medlink(#
+medlink(#     address TEXT NOT NULL,
+medlink(#
+medlink(#     latitude NUMERIC(9,6) NOT NULL
+medlink(#         CHECK (latitude BETWEEN -90 AND 90),
+medlink(#
+medlink(#     longitude NUMERIC(9,6) NOT NULL
+medlink(#         CHECK (longitude BETWEEN -180 AND 180),
+medlink(#
+medlink(#     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_ambulance_providers_updated_at
+medlink-# BEFORE UPDATE ON ambulance_providers
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# \d ambulance_providers;
+                         Table "public.ambulance_providers"
+    Column     |           Type           | Collation | Nullable |      Default
+---------------+--------------------------+-----------+----------+-------------------
+ id            | uuid                     |           | not null | gen_random_uuid()
+ provider_name | character varying(255)   |           | not null |
+ phone         | character varying(20)    |           | not null |
+ address       | text                     |           | not null |
+ latitude      | numeric(9,6)             |           | not null |
+ longitude     | numeric(9,6)             |           | not null |
+ is_active     | boolean                  |           | not null | true
+ created_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at    | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "ambulance_providers_pkey" PRIMARY KEY, btree (id)
+    "ambulance_providers_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Check constraints:
+    "ambulance_providers_latitude_check" CHECK (latitude >= '-90'::integer::numeric AND latitude <= 90::numeric)
+    "ambulance_providers_longitude_check" CHECK (longitude >= '-180'::integer::numeric AND longitude <= 180::numeric)
+Triggers:
+    trg_ambulance_providers_updated_at BEFORE UPDATE ON ambulance_providers FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=#

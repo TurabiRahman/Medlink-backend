@@ -1,5 +1,3 @@
-# User Table --------------
-
 id
 role_type
 
@@ -85,3 +83,11 @@ Indexes:
     "users_email_key" UNIQUE CONSTRAINT, btree (email)
     "users_phone_key" UNIQUE CONSTRAINT, btree (phone)
 
+
+
+<> Attching trigger --------------
+
+CREATE TRIGGER trg_users_updated_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
