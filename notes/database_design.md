@@ -365,3 +365,43 @@ Medical Event Created
                 │
                 ▼
             Payment Generated
+
+
+# Until now I have build these things
+
+👤 User Module
+
+✅ users
+✅ user_profiles
+✅ user_locations
+✅ blood_information
+✅ blood_donation_history
+
+
+🏥 Hospital Module
+
+✅ hospitals
+✅ hospital_admins
+✅ hospital_wards
+✅ hospital_beds
+
+
+🚑 Ambulance Module
+
+✅ ambulance_providers
+
+
+🤖 AI Module
+
+✅ medical_events
+✅ ai_responses
+✅ event_hospitals
+✅ event_ambulances
+
+
+🛏️ Reservation Module
+
+✅ reservations
+✅ payments
+
+That's 16 tables.

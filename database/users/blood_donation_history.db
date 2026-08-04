@@ -50,3 +50,12 @@ Indexes:
 Foreign-key constraints:
     "fk_blood_donation_history_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 
+
+# this code will run after the hospitals table is being created
+
+ALTER TABLE blood_donation_history
+ADD CONSTRAINT fk_blood_donation_history_hospital
+FOREIGN KEY (hospital_id)
+REFERENCES hospitals(id)
+ON DELETE SET NULL;
+

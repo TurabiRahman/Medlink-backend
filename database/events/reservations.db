@@ -1,0 +1,77 @@
+| Column             | Type        | Description                                           |
+| ------------------ | ----------- | ----------------------------------------------------- |
+| id                 | UUID        | Primary Key                                           |
+| medical_event_id   | UUID        | Which AI event                                        |
+| user_id            | UUID        | Patient                                               |
+| hospital_id        | UUID        | Hospital                                              |
+| ward_id            | UUID        | Ward                                                  |
+| bed_id             | UUID        | Reserved Bed                                          |
+| reservation_mode   | ENUM        | NORMAL / EMERGENCY                                    |
+| reservation_status | ENUM        | PENDING / APPROVED / REJECTED / CANCELLED / COMPLETED |
+| requested_at       | TIMESTAMPTZ | Request time                                          |
+| approved_at        | TIMESTAMPTZ | Approval time                                         |
+| created_at         | TIMESTAMPTZ | Record created                                        |
+| updated_at         | TIMESTAMPTZ | Auto updated                                          |
+
+
+CREATE TABLE reservations (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    medical_event_id UUID NOT NULL,
+
+    user_id UUID NOT NULL,
+
+    hospital_id UUID NOT NULL,
+
+    ward_id UUID NOT NULL,
+
+    bed_id UUID,
+
+    reservation_mode reservation_mode_type NOT NULL,
+
+    reservation_status reservation_status_type
+        NOT NULL DEFAULT 'PENDING',
+
+    requested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    approved_at TIMESTAMPTZ,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_reservations_event
+        FOREIGN KEY (medical_event_id)
+        REFERENCES medical_events(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_reservations_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_reservations_hospital
+        FOREIGN KEY (hospital_id)
+        REFERENCES hospitals(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_reservations_ward
+        FOREIGN KEY (ward_id)
+        REFERENCES hospital_wards(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_reservations_bed
+        FOREIGN KEY (bed_id)
+        REFERENCES hospital_beds(id)
+        ON DELETE SET NULL
+
+);
+
+
+# Trigger for this table
+
+CREATE TRIGGER trg_reservations_updated_at
+BEFORE UPDATE ON reservations
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();

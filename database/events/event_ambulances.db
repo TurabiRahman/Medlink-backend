@@ -1,0 +1,33 @@
+id
+
+medical_event_id
+
+ambulance_provider_id
+
+created_at
+
+CREATE TABLE event_ambulances (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    medical_event_id UUID NOT NULL,
+
+    ambulance_provider_id UUID NOT NULL,
+
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_event_ambulances_event
+        FOREIGN KEY (medical_event_id)
+        REFERENCES medical_events(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_event_ambulances_provider
+        FOREIGN KEY (ambulance_provider_id)
+        REFERENCES ambulance_providers(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_event_ambulance
+        UNIQUE (medical_event_id, ambulance_provider_id)
+
+);
+

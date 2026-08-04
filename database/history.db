@@ -813,3 +813,292 @@ Indexes:
 Foreign-key constraints:
     "fk_ai_responses_medical_event" FOREIGN KEY (medical_event_id) REFERENCES medical_events(id) ON DELETE CASCADE
 
+medlink=# \d
+                 List of relations
+ Schema |          Name          | Type  |  Owner
+--------+------------------------+-------+----------
+ public | ai_responses           | table | postgres
+ public | ambulance_providers    | table | postgres
+ public | blood_donation_history | table | postgres
+ public | blood_information      | table | postgres
+ public | hospital_admins        | table | postgres
+ public | hospital_beds          | table | postgres
+ public | hospital_wards         | table | postgres
+ public | hospitals              | table | postgres
+ public | medical_events         | table | postgres
+ public | user_locations         | table | postgres
+ public | user_profiles          | table | postgres
+ public | users                  | table | postgres
+(12 rows)
+
+
+medlink=# CREATE TABLE event_hospitals (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     medical_event_id UUID NOT NULL,
+medlink(#
+medlink(#     hospital_id UUID NOT NULL,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_event_hospitals_event
+medlink(#         FOREIGN KEY (medical_event_id)
+medlink(#         REFERENCES medical_events(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_event_hospitals_hospital
+medlink(#         FOREIGN KEY (hospital_id)
+medlink(#         REFERENCES hospitals(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT uq_event_hospital
+medlink(#         UNIQUE (medical_event_id, hospital_id)
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TABLE event_ambulances (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     medical_event_id UUID NOT NULL,
+medlink(#
+medlink(#     ambulance_provider_id UUID NOT NULL,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_event_ambulances_event
+medlink(#         FOREIGN KEY (medical_event_id)
+medlink(#         REFERENCES medical_events(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_event_ambulances_provider
+medlink(#         FOREIGN KEY (ambulance_provider_id)
+medlink(#         REFERENCES ambulance_providers(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT uq_event_ambulance
+medlink(#         UNIQUE (medical_event_id, ambulance_provider_id)
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# \d event_hospitals
+                             Table "public.event_hospitals"
+      Column      |           Type           | Collation | Nullable |      Default
+------------------+--------------------------+-----------+----------+-------------------
+ id               | uuid                     |           | not null | gen_random_uuid()
+ medical_event_id | uuid                     |           | not null |
+ hospital_id      | uuid                     |           | not null |
+ created_at       | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "event_hospitals_pkey" PRIMARY KEY, btree (id)
+    "uq_event_hospital" UNIQUE CONSTRAINT, btree (medical_event_id, hospital_id)
+Foreign-key constraints:
+    "fk_event_hospitals_event" FOREIGN KEY (medical_event_id) REFERENCES medical_events(id) ON DELETE CASCADE
+    "fk_event_hospitals_hospital" FOREIGN KEY (hospital_id) REFERENCES hospitals(id) ON DELETE CASCADE
+
+medlink=# \d event_ambulances
+                               Table "public.event_ambulances"
+        Column         |           Type           | Collation | Nullable |      Default
+-----------------------+--------------------------+-----------+----------+-------------------
+ id                    | uuid                     |           | not null | gen_random_uuid()
+ medical_event_id      | uuid                     |           | not null |
+ ambulance_provider_id | uuid                     |           | not null |
+ created_at            | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "event_ambulances_pkey" PRIMARY KEY, btree (id)
+    "uq_event_ambulance" UNIQUE CONSTRAINT, btree (medical_event_id, ambulance_provider_id)
+Foreign-key constraints:
+    "fk_event_ambulances_event" FOREIGN KEY (medical_event_id) REFERENCES medical_events(id) ON DELETE CASCADE
+    "fk_event_ambulances_provider" FOREIGN KEY (ambulance_provider_id) REFERENCES ambulance_providers(id) ON DELETE CASCADE
+
+
+medlink=# ALTER TABLE blood_donation_history
+medlink-# ADD CONSTRAINT fk_blood_donation_history_hospital
+medlink-# FOREIGN KEY (hospital_id)
+medlink-# REFERENCES hospitals(id)
+medlink-# ON DELETE SET NULL;
+ALTER TABLE
+medlink=# CREATE TABLE reservations (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     medical_event_id UUID NOT NULL,
+medlink(#
+medlink(#     user_id UUID NOT NULL,
+medlink(#
+medlink(#     hospital_id UUID NOT NULL,
+medlink(#
+medlink(#     ward_id UUID NOT NULL,
+medlink(#
+medlink(#     bed_id UUID,
+medlink(#
+medlink(#     reservation_mode reservation_mode_type NOT NULL,
+medlink(#
+medlink(#     reservation_status reservation_status_type
+medlink(#         NOT NULL DEFAULT 'PENDING',
+medlink(#
+medlink(#     requested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     approved_at TIMESTAMPTZ,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_reservations_event
+medlink(#         FOREIGN KEY (medical_event_id)
+medlink(#         REFERENCES medical_events(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_reservations_user
+medlink(#         FOREIGN KEY (user_id)
+medlink(#         REFERENCES users(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_reservations_hospital
+medlink(#         FOREIGN KEY (hospital_id)
+medlink(#         REFERENCES hospitals(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_reservations_ward
+medlink(#         FOREIGN KEY (ward_id)
+medlink(#         REFERENCES hospital_wards(id)
+medlink(#         ON DELETE CASCADE,
+medlink(#
+medlink(#     CONSTRAINT fk_reservations_bed
+medlink(#         FOREIGN KEY (bed_id)
+medlink(#         REFERENCES hospital_beds(id)
+medlink(#         ON DELETE SET NULL
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# CREATE TRIGGER trg_reservations_updated_at
+medlink-# BEFORE UPDATE ON reservations
+medlink-# FOR EACH ROW
+medlink-# EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER
+medlink=# CREATE TABLE payments (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     reservation_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     total_amount NUMERIC(10,2) NOT NULL
+medlink(#         CHECK (total_amount >= 0),
+medlink(#
+medlink(#     payment_method payment_method_type NOT NULL,
+medlink(#
+medlink(#     payment_status payment_status_type
+medlink(#         NOT NULL DEFAULT 'PENDING',
+medlink(#
+medlink(#     paid_at TIMESTAMPTZ,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_payments_reservation
+medlink(#         FOREIGN KEY (reservation_id)
+medlink(#         REFERENCES reservations(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+ERROR:  invalid input value for enum payment_status_type: "PENDING"
+LINE 8:         NOT NULL DEFAULT 'PENDING',
+                                 ^
+medlink=# \dT+ payment_status_type
+                                                   List of data types
+ Schema |        Name         |    Internal name    | Size |    Elements    |  Owner   | Access privileges | Description
+--------+---------------------+---------------------+------+----------------+----------+-------------------+-------------
+ public | payment_status_type | payment_status_type | 4    | UNPAID        +| postgres |                   |
+        |                     |                     |      | PARTIALLY_PAID+|          |                   |
+        |                     |                     |      | PAID          +|          |                   |
+        |                     |                     |      | REFUNDED       |          |                   |
+(1 row)
+
+
+medlink=# SELECT unnest(enum_range(NULL::payment_status_type));
+     unnest
+----------------
+ UNPAID
+ PARTIALLY_PAID
+ PAID
+ REFUNDED
+(4 rows)
+
+
+medlink=# CREATE TABLE payments (
+medlink(#
+medlink(#     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+medlink(#
+medlink(#     reservation_id UUID NOT NULL UNIQUE,
+medlink(#
+medlink(#     total_amount NUMERIC(10,2) NOT NULL
+medlink(#         CHECK (total_amount >= 0),
+medlink(#
+medlink(#     payment_method payment_method_type NOT NULL,
+medlink(#
+medlink(#     payment_status payment_status_type
+medlink(#         NOT NULL DEFAULT 'UNPAID',
+medlink(#
+medlink(#     paid_at TIMESTAMPTZ,
+medlink(#
+medlink(#     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+medlink(#
+medlink(#     CONSTRAINT fk_payments_reservation
+medlink(#         FOREIGN KEY (reservation_id)
+medlink(#         REFERENCES reservations(id)
+medlink(#         ON DELETE CASCADE
+medlink(#
+medlink(# );
+CREATE TABLE
+medlink=# \d reservations
+                                        Table "public.reservations"
+       Column       |           Type           | Collation | Nullable |              Default
+--------------------+--------------------------+-----------+----------+------------------------------------
+ id                 | uuid                     |           | not null | gen_random_uuid()
+ medical_event_id   | uuid                     |           | not null |
+ user_id            | uuid                     |           | not null |
+ hospital_id        | uuid                     |           | not null |
+ ward_id            | uuid                     |           | not null |
+ bed_id             | uuid                     |           |          |
+ reservation_mode   | reservation_mode_type    |           | not null |
+ reservation_status | reservation_status_type  |           | not null | 'PENDING'::reservation_status_type
+ requested_at       | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ approved_at        | timestamp with time zone |           |          |
+ created_at         | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+ updated_at         | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "reservations_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "fk_reservations_bed" FOREIGN KEY (bed_id) REFERENCES hospital_beds(id) ON DELETE SET NULL
+    "fk_reservations_event" FOREIGN KEY (medical_event_id) REFERENCES medical_events(id) ON DELETE CASCADE
+    "fk_reservations_hospital" FOREIGN KEY (hospital_id) REFERENCES hospitals(id) ON DELETE CASCADE
+    "fk_reservations_user" FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    "fk_reservations_ward" FOREIGN KEY (ward_id) REFERENCES hospital_wards(id) ON DELETE CASCADE
+Referenced by:
+    TABLE "payments" CONSTRAINT "fk_payments_reservation" FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE
+Triggers:
+    trg_reservations_updated_at BEFORE UPDATE ON reservations FOR EACH ROW EXECUTE FUNCTION update_updated_at_column()
+
+
+medlink=# \d payments
+                                     Table "public.payments"
+     Column     |           Type           | Collation | Nullable |            Default
+----------------+--------------------------+-----------+----------+-------------------------------
+ id             | uuid                     |           | not null | gen_random_uuid()
+ reservation_id | uuid                     |           | not null |
+ total_amount   | numeric(10,2)            |           | not null |
+ payment_method | payment_method_type      |           | not null |
+ payment_status | payment_status_type      |           | not null | 'UNPAID'::payment_status_type
+ paid_at        | timestamp with time zone |           |          |
+ created_at     | timestamp with time zone |           | not null | CURRENT_TIMESTAMP
+Indexes:
+    "payments_pkey" PRIMARY KEY, btree (id)
+    "payments_reservation_id_key" UNIQUE CONSTRAINT, btree (reservation_id)
+Check constraints:
+    "payments_total_amount_check" CHECK (total_amount >= 0::numeric)
+Foreign-key constraints:
+    "fk_payments_reservation" FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE
+
+
+medlink=#
