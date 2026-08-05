@@ -36,6 +36,35 @@
                AMBULANCE_PROVIDERS
 
 
+# Update 0.1
+
+                 USER MODULE
+                     users
+              /      |       \
+             /       |        \
+   user_profiles  user_locations  blood_information
+                                  |
+                                  |
+                     blood_donation_history
+
+                     |
+                     |
+               medical_events
+              /       |         \
+             /        |          \
+    ai_responses  event_hospitals  event_ambulances
+                      |                 |
+                 hospitals      ambulance_providers
+                     |
+          ------------------------
+          |          |           |
+ hospital_admins  hospital_wards  reservations
+                       |
+                 hospital_beds
+                       |
+                  payments
+
+                  
 
 
 | No | Table                  | Purpose                |
