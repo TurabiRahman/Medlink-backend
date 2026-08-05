@@ -32,6 +32,32 @@ const signupSchema = z.object({
   ]),
 });
 
+const loginSchema = z.object({
+  email: z
+    .email("Please provide a valid email address")
+    .trim(),
+
+  password: z
+    .string()
+    .min(1, "Password is required"),
+
+  rememberMe: z
+    .boolean()
+    .optional()
+    .default(false),
+});
+
+const emergencyLoginSchema = z.object({
+    phone: z
+        .string()
+        .regex(
+            /^\+8801[3-9]\d{8}$/,
+            "Phone number must be in the format +880XXXXXXXXXX"
+        ),
+});
+
 module.exports = {
   signupSchema,
+  loginSchema,
+  emergencyLoginSchema,
 };

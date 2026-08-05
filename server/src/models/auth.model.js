@@ -81,13 +81,43 @@ const createUser = async ({
   return rows[0];
 };
 
+// to update the last login
+
+const updateLastLogin = async (userId) => {
+    const query = `
+        UPDATE users
+        SET last_login = CURRENT_TIMESTAMP
+        WHERE id = $1
+        RETURNING last_login;
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    return result.rows[0];
+};
 
 
+// I will check the user here 
 
+const hasUserProfile = async (userId) => {
+
+    const query = `
+        SELECT 1
+        FROM user_profiles
+        WHERE user_id = $1
+        LIMIT 1;
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    return result.rowCount > 0;
+};
 
 
 module.exports = {
   findUserByEmail,
   findUserByPhone,
   createUser,
+  updateLastLogin,
+  hasUserProfile,
 };

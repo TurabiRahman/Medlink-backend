@@ -133,3 +133,174 @@ Controller
    ▼
 JSON Response
 
+# Method
+POST
+
+# URL
+http://localhost:3000/api/v1/auth/signup
+
+# Headers
+Key	            Value
+Content-Type	  application/json
+Accept	        application/json
+
+# Body
+
+Choose:
+
+Body
+  ↓
+raw
+  ↓
+JSON
+
+# req
+
+{
+    "email": "turabi@gmail.com",
+    "phone": "+8801712345678",
+    "password": "SecurePass123!",
+    "userType": "CUSTOMER"
+}
+
+# res ---> 201 Created
+
+{
+
+    "success": true,
+
+    "message": "User registered successfully",
+
+    "statusCode": 201,
+
+    "data": {
+
+        "userId": "80c21f03-8489-4f9a-acea-b90b90bcac44",
+
+        "email": "turabi@gmail.com",
+
+        "phone": "+8801712345678",
+
+        "userType": "CUSTOMER",
+
+        "createdAt": "2026-08-05T15:10:33.049Z"
+
+    },
+
+    "token": {
+
+        "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MGMyMWYwMy04NDg5LTRmOWEtYWNlYS1iOTBiOTBiY2FjNDQiLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODU5NDI2MzMsImV4cCI6MTc4NTk0NjIzM30.TBvXcYi3mDxllWuzpTjxroSYQHL5IGwp6B6L2KmgOB4",
+
+        "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4MGMyMWYwMy04NDg5LTRmOWEtYWNlYS1iOTBiOTBiY2FjNDQiLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3ODU5NDI2MzMsImV4cCI6MTc4NjU0NzQzM30.s-Ol1hGKs4-Tgj4YJKlibZbF4EGNXs1Vw0Y5JqsrPg8",
+
+        "expiresIn": 3600,
+
+        "tokenType": "Bearer"
+
+    }
+
+}
+
+# req
+
+{
+    "email": "turabi@gmail.com",
+    "phone": "+8801712345678",
+    "password": "SecurePass123!",
+    "userType": "CUSTOMER"
+}
+
+# res ---> 409 Conflict
+
+{
+    "success": false,
+    "message": "User already registered with this email",
+    "statusCode": 409,
+    "errorCode": "EMAIL_EXISTS"
+}
+
+# req
+
+{
+    "email": "another@example.com",
+    "phone": "+8801712345678",
+    "password": "SecurePass123!",
+    "userType": "CUSTOMER"
+}
+
+# res ---> 409 Conflict
+
+{
+    "success": false,
+    "message": "User already registered with this phone number",
+    "statusCode": 409,
+    "errorCode": "PHONE_EXISTS"
+}
+
+# req
+
+{
+    "email": "abc",
+    "phone": "+8801712345678",
+    "password": "SecurePass123!",
+    "userType": "CUSTOMER"
+}
+
+# res ---> 400 Bad Request
+
+{
+    "success": false,
+    "message": "Validation error",
+    "statusCode": 400,
+    "errors": [
+        {
+            "field": "email",
+            "message": "Please provide a valid email address"
+        }
+    ]
+}
+
+# req
+
+{
+    "email": "john@example.com",
+    "phone": "+8801712345678",
+    "password": "SecurePass123!",
+    "userType": "customer"
+}
+
+# res ---> 400 Bad Request
+
+{
+    "success": false,
+    "message": "Validation error",
+    "statusCode": 400,
+    "errors": [
+        {
+            "field": "email",
+            "message": "Please provide a valid email address"
+        }
+    ]
+}
+
+
+# res --> 400 Bad Request
+
+{
+    "success": false,
+    "message": "Validation error",
+    "statusCode": 400,
+    "errors": [
+        {
+            "field": "userType",
+            "message": "Invalid option: expected one of \"CUSTOMER\"|\"SUPER_ADMIN\"|\"HOSPITAL_ADMIN\"|\"AMBULANCE_ADMIN\""
+        }
+    ]
+}
+
+Because the ENUM accepts only:
+
+CUSTOMER
+SUPER_ADMIN
+HOSPITAL_ADMIN
+AMBULANCE_ADMIN

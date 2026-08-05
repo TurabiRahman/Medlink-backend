@@ -4,12 +4,79 @@ const {
   findUserByEmail,
   findUserByPhone,
   createUser,
+  updateLastLogin,
+  hasUserProfile,
 } = require("../models/auth.model");
 
 const {
   generateAccessToken,
   generateRefreshToken,
 } = require("../utils/jwt");
+
+const login = async ({ email, password }) => {
+
+    // Find user
+    const user = await findUserByEmail(email);
+
+    if (!user) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        error.errorCode = "USER_NOT_FOUND";
+        throw error;
+    }
+
+    // Check account status
+    if (!user.is_active) {
+        const error = new Error("Account has been deactivated");
+        error.statusCode = 403;
+        error.errorCode = "ACCOUNT_DISABLED";
+        throw error;
+    }
+
+    // Compare password
+    const isPasswordCorrect = await bcrypt.compare(
+        password,
+        user.password_hash
+    );
+
+    if (!isPasswordCorrect) {
+        const error = new Error("Invalid email or password");
+        error.statusCode = 401;
+        error.errorCode = "INVALID_CREDENTIALS";
+        throw error;
+    }
+
+    // Update login time
+    const updatedLogin = await updateLastLogin(user.id);
+
+    // Profile exists?
+    const profileComplete = await hasUserProfile(user.id);
+
+    // JWT payload
+    const payload = {
+        userId: user.id,
+        role: user.role_type,
+    };
+
+    const accessToken = generateAccessToken(payload);
+    const refreshToken = generateRefreshToken(payload);
+
+    return {
+        user: {
+            ...user,
+            last_login: updatedLogin.last_login,
+        },
+
+        profileComplete,
+
+        token: {
+            accessToken,
+            refreshToken,
+            expiresIn: 3600,
+            tokenType: "Bearer",
+        },
+    };
+};
 
 const signup = async ({ email, phone, password, userType }) => {
   // Check if email already exists
@@ -72,6 +139,25 @@ const signup = async ({ email, phone, password, userType }) => {
   };
 };
 
+
+// I will use it for my emergency login feature
+
+const startEmergencySession = async ({ phone }) => {
+
+    return {
+        phone,
+        isEmergency: true,
+    };
+
+};
+
+const logout = async () => {
+    return true;
+};
+
 module.exports = {
   signup,
+  login,
+  startEmergencySession,
+  logout,
 };
