@@ -18,6 +18,14 @@
 
 ---
 
+
+
+
+
+
+
+
+
 # 1. AUTHENTICATION ENDPOINTS
 
 ### Common Authentication
@@ -47,6 +55,14 @@ Reset password with token | No Auth Required
 Email verification | No Auth Required
 
 ---
+
+
+
+
+
+
+
+
 
 # 2. USER MODULE ENDPOINTS
 
@@ -102,6 +118,20 @@ Get location history | Auth Required | Roles: Customer
 **Query Params:** `?limit=50&offset=0&startDate=2024-01-01&endDate=2024-01-15`
 
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 3. CUSTOMER MODULE ENDPOINTS
 
