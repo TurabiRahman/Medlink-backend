@@ -1,0 +1,91 @@
+const userService = require("../services/user.service");
+
+const completeProfile = async (req, res) => {
+
+    try {
+
+        const result = await userService.completeProfile(
+            req.user.userId,
+            req.body
+        );
+
+        return res.status(201).json({
+            success: true,
+            message: "Profile completed successfully",
+            statusCode: 201,
+            data: {
+                profile: result.profile,
+                bloodInformation: result.blood,
+            },
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+const getProfile = async (req, res) => {
+
+    try {
+
+        const profile = await userService.getProfile(req.user.userId);
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile fetched successfully",
+            statusCode: 200,
+            data: profile,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+const updateProfile = async (req, res) => {
+
+    try {
+
+        const result = await userService.updateProfile(
+            req.user.userId,
+            req.body
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Profile updated successfully",
+            statusCode: 200,
+            data: result,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+module.exports = {
+    completeProfile,
+    getProfile,
+    updateProfile,
+};
