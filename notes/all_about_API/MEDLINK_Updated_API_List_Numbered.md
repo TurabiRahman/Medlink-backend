@@ -133,6 +133,8 @@ Get location history | Auth Required | Roles: Customer
 
 
 
+
+
 # 3. CUSTOMER MODULE ENDPOINTS
 
 ### Dashboard
@@ -353,6 +355,22 @@ Cancel reservation | Auth Required | Roles: Customer
 Get reservation status | Auth Required | Roles: Customer
 
 ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 4. HOSPITAL MODULE ENDPOINTS
 
@@ -637,6 +655,24 @@ Update hospital status | Auth Required | Roles: Hospital Admin
 
 ---
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # 5. AMBULANCE MODULE ENDPOINTS
 
 ### Ambulance Management (Admin Only - Phase 1)
@@ -687,6 +723,16 @@ Update ambulance contact information | Auth Required | Roles: Ambulance Admin
 - Live ambulance status updates
 
 ---
+
+
+
+
+
+
+
+
+
+
 
 # 6. SUPER ADMIN ENDPOINTS
 
@@ -791,6 +837,17 @@ Get system analytics | Auth Required | Roles: Super Admin
 
 ---
 
+
+
+
+
+
+
+
+
+
+
+
 # 7. UTILITY ENDPOINTS
 
 ### Health & Version
@@ -859,6 +916,9 @@ Mark notification as read | Auth Required
 ```
 
 ---
+
+
+
 
 # 8. ENDPOINT SUMMARY BY COUNT
 

@@ -84,8 +84,120 @@ const updateProfile = async (req, res) => {
 
 };
 
+const getUserDetails = async (req, res) => {
+
+    try {
+
+        const user = await userService.getUserDetails(
+            req.params.userId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "User fetched successfully",
+            statusCode: 200,
+            data: user,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+const getAllUsers = async (req, res) => {
+
+    try {
+
+        const users = await userService.getAllUsersService();
+
+        return res.status(200).json({
+            success: true,
+            message: "Users fetched successfully",
+            statusCode: 200,
+            count: users.length,
+            data: users,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+const updateRole = async (req, res) => {
+
+    try {
+
+        const user = await userService.updateRole(
+            req.params.userId,
+            req.body.roleType
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "User role updated successfully",
+            statusCode: 200,
+            data: user,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+const deleteUserAccount = async (req, res) => {
+
+    try {
+
+        await userService.deleteUserAccount(
+            req.user,
+            req.params.userId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "User deleted successfully",
+            statusCode: 200,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
 module.exports = {
     completeProfile,
     getProfile,
     updateProfile,
+    getUserDetails,
+    getAllUsers,
+    updateRole,
+    deleteUserAccount,
 };

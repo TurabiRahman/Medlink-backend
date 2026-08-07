@@ -54,7 +54,17 @@ const profileSchema = z.object({
     ]),
 });
 
+const roleSchema = z.object({
+    roleType: z.enum([
+        "CUSTOMER",
+        "SUPER_ADMIN",
+        "HOSPITAL_ADMIN",
+        "AMBULANCE_ADMIN",
+    ]),
+});
+
 module.exports = {
     profileSchema,
     updateProfileSchema: profileSchema,
+    roleSchema,
 };

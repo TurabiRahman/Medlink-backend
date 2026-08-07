@@ -2,6 +2,10 @@ const {
     createUserProfile,
     getProfileByUserId,
     updateUserProfile,
+    getUserById,
+    getAllUsers,
+    updateUserRole,
+    deleteUser
 } = require("../models/user.model");
 
 const completeProfile = async (userId, data) => {
@@ -60,8 +64,74 @@ const updateProfile = async (userId, body) => {
 
 };
 
+const getUserDetails = async (userId) => {
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return user;
+};
+
+const getAllUsersService = async () => {
+
+    const users = await getAllUsers();
+
+    return users;
+
+};
+
+const updateRole = async (userId, roleType) => {
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const updatedUser = await updateUserRole(
+        userId,
+        roleType
+    );
+
+    return updatedUser;
+
+};
+
+const deleteUserAccount = async (requestUser, targetUserId) => {
+
+    if (
+        requestUser.role !== "SUPER_ADMIN" &&
+        requestUser.userId !== targetUserId
+    ) {
+        const error = new Error("You can delete only your own account");
+        error.statusCode = 403;
+        throw error;
+    }
+
+    const deletedUser = await deleteUser(targetUserId);
+
+    if (!deletedUser) {
+        const error = new Error("User not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return deletedUser;
+};
+
 module.exports = {
     completeProfile,
     getProfile,
-    updateProfile, 
+    updateProfile,
+    getUserDetails,
+    getAllUsersService,
+    updateRole,
+    deleteUserAccount
 };

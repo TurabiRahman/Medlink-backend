@@ -58,3 +58,16 @@ src/
 │
 └── validations/
       └── user.validation.js
+
+
+
+now its the time to build last part of the User Module
+Time: 2026-08-07T10:14:20.268Z
+
+| Order | Endpoint                          | Difficulty | 
+| ----- | --------------------------------- | ---------- | 
+|   1   | `GET /api/v1/users/{userId}`      | Easy       | 
+|   2   | `GET /api/v1/users/all`           | Easy       | 
+|   3   | `PUT /api/v1/users/{userId}/role` | Easy       | 
+|   4   | `DELETE /api/v1/users/{userId}`   | Medium     | 
+|   5   | `GET /api/v1/users/location`      | Very Easy  | 

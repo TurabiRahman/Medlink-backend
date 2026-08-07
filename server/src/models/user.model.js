@@ -209,8 +209,130 @@ const updateUserProfile = async (
 
 };
 
+const getUserById = async (userId) => {
+    const query = `
+        SELECT
+            u.id,
+            u.email,
+            u.phone,
+            u.role_type,
+            u.is_verified,
+            u.is_active,
+            u.last_login,
+            u.created_at,
+
+            up.first_name,
+            up.last_name,
+            up.gender,
+            up.date_of_birth,
+            up.national_id,
+            up.address,
+            up.emergency_contact_name,
+            up.emergency_contact_phone,
+
+            bi.blood_group,
+            bi.last_donation_date,
+            bi.can_donate,
+            bi.next_available_date,
+            bi.is_available_for_donation
+
+        FROM users u
+
+        LEFT JOIN user_profiles up
+            ON up.user_id = u.id
+
+        LEFT JOIN blood_information bi
+            ON bi.user_id = u.id
+
+        WHERE u.id = $1;
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    return result.rows[0];
+};
+
+const getAllUsers = async () => {
+    const query = `
+        SELECT
+            u.id,
+            u.email,
+            u.phone,
+            u.role_type,
+            u.is_verified,
+            u.is_active,
+            u.last_login,
+            u.created_at,
+
+            up.first_name,
+            up.last_name,
+            up.gender,
+            up.date_of_birth,
+            up.national_id,
+            up.address,
+
+            bi.blood_group,
+            bi.can_donate,
+            bi.is_available_for_donation
+
+        FROM users u
+
+        LEFT JOIN user_profiles up
+            ON up.user_id = u.id
+
+        LEFT JOIN blood_information bi
+            ON bi.user_id = u.id
+
+        ORDER BY u.created_at DESC;
+    `;
+
+    const result = await pool.query(query);
+
+    return result.rows;
+};
+
+const updateUserRole = async (userId, roleType) => {
+
+    const query = `
+        UPDATE users
+        SET
+            role_type = $2
+        WHERE id = $1
+        RETURNING
+            id,
+            email,
+            phone,
+            role_type,
+            updated_at;
+    `;
+
+    const result = await pool.query(query, [
+        userId,
+        roleType,
+    ]);
+
+    return result.rows[0];
+
+};
+
+const deleteUser = async (userId) => {
+    const query = `
+        DELETE FROM users
+        WHERE id = $1
+        RETURNING id, email;
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    return result.rows[0];
+};
+
 module.exports = {
     createUserProfile,
     getProfileByUserId,
-    updateUserProfile,  
+    updateUserProfile,
+    getUserById,
+    getAllUsers,
+    updateUserRole,
+    deleteUser,
 };
