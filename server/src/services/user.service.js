@@ -5,7 +5,9 @@ const {
     getUserById,
     getAllUsers,
     updateUserRole,
-    deleteUser
+    deleteUser,
+    getUserLocation,
+    upsertUserLocation
 } = require("../models/user.model");
 
 const completeProfile = async (userId, data) => {
@@ -126,6 +128,37 @@ const deleteUserAccount = async (requestUser, targetUserId) => {
     return deletedUser;
 };
 
+const getMyLocation = async (userId) => {
+
+    const location = await getUserLocation(userId);
+
+    if (!location) {
+        const error = new Error("Location not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return location;
+
+};
+
+const updateMyLocation = async (
+    userId,
+    body
+) => {
+
+    return await upsertUserLocation({
+
+        userId,
+
+        latitude: body.latitude,
+
+        longitude: body.longitude,
+
+    });
+
+};
+
 module.exports = {
     completeProfile,
     getProfile,
@@ -133,5 +166,7 @@ module.exports = {
     getUserDetails,
     getAllUsersService,
     updateRole,
-    deleteUserAccount
+    deleteUserAccount,
+    getMyLocation,
+    updateMyLocation,
 };

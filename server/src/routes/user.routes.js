@@ -8,7 +8,8 @@ const validate = require("../middlewares/validate.middleware");
 
 const { profileSchema, 
         updateProfileSchema,
-        roleSchema
+        roleSchema,
+        locationSchema
      } = require("../validations/user.validation");
 
 const { completeProfile, 
@@ -17,7 +18,9 @@ const { completeProfile,
         getUserDetails, 
         getAllUsers, 
         updateRole,
-        deleteUserAccount
+        deleteUserAccount,
+        getMyLocation,
+        updateMyLocation
     } = require("../controllers/user.controller");
 
 const authorize = require("../middlewares/authorize.middleware");
@@ -51,6 +54,18 @@ router.get(
 );
 
 router.get(
+    "/location",
+    authenticate,
+    authorize(
+        "CUSTOMER",
+        "HOSPITAL_ADMIN",
+        "AMBULANCE_ADMIN",
+        "SUPER_ADMIN"
+    ),
+    getMyLocation
+);
+
+router.get(
     "/:userId",
     authenticate,
     authorize("SUPER_ADMIN"),
@@ -70,6 +85,19 @@ router.delete(
     authenticate,
     authorize("CUSTOMER", "SUPER_ADMIN"),
     deleteUserAccount
+);
+
+router.put(
+    "/location",
+    authenticate,
+    authorize(
+        "CUSTOMER",
+        "HOSPITAL_ADMIN",
+        "AMBULANCE_ADMIN",
+        "SUPER_ADMIN"
+    ),
+    validate(locationSchema),
+    updateMyLocation
 );
 
 module.exports = router;

@@ -192,6 +192,71 @@ const deleteUserAccount = async (req, res) => {
 
 };
 
+const getMyLocation = async (req, res) => {
+
+    try {
+
+        const location = await userService.getMyLocation(
+            req.user.userId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Location fetched successfully",
+            statusCode: 200,
+            data: location,
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+            success: false,
+            message: error.message,
+            statusCode: error.statusCode || 500,
+        });
+
+    }
+
+};
+
+const updateMyLocation = async (req, res) => {
+
+    try {
+
+        const location =
+            await userService.updateMyLocation(
+                req.user.userId,
+                req.body
+            );
+
+        return res.status(200).json({
+
+            success: true,
+
+            message: "Location updated successfully",
+
+            statusCode: 200,
+
+            data: location,
+
+        });
+
+    } catch (error) {
+
+        return res.status(error.statusCode || 500).json({
+
+            success: false,
+
+            message: error.message,
+
+            statusCode: error.statusCode || 500,
+
+        });
+
+    }
+
+};
+
 module.exports = {
     completeProfile,
     getProfile,
@@ -200,4 +265,6 @@ module.exports = {
     getAllUsers,
     updateRole,
     deleteUserAccount,
+    getMyLocation,
+    updateMyLocation,
 };

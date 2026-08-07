@@ -327,6 +327,67 @@ const deleteUser = async (userId) => {
     return result.rows[0];
 };
 
+const getUserLocation = async (userId) => {
+
+    const query = `
+        SELECT
+            id,
+            user_id,
+            latitude,
+            longitude,
+            updated_at
+        FROM user_locations
+        WHERE user_id = $1;
+    `;
+
+    const result = await pool.query(query, [userId]);
+
+    return result.rows[0];
+
+};
+
+const upsertUserLocation = async ({
+    userId,
+    latitude,
+    longitude,
+}) => {
+
+    const query = `
+        INSERT INTO user_locations
+        (
+            user_id,
+            latitude,
+            longitude
+        )
+
+        VALUES
+        (
+            $1,
+            $2,
+            $3
+        )
+
+        ON CONFLICT (user_id)
+
+        DO UPDATE SET
+
+            latitude = EXCLUDED.latitude,
+            longitude = EXCLUDED.longitude,
+            updated_at = CURRENT_TIMESTAMP
+
+        RETURNING *;
+    `;
+
+    const result = await pool.query(query, [
+        userId,
+        latitude,
+        longitude,
+    ]);
+
+    return result.rows[0];
+
+};
+
 module.exports = {
     createUserProfile,
     getProfileByUserId,
@@ -335,4 +396,6 @@ module.exports = {
     getAllUsers,
     updateUserRole,
     deleteUser,
+    getUserLocation,
+    upsertUserLocation,
 };

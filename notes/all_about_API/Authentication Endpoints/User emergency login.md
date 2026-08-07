@@ -57,3 +57,30 @@ Return Emergency Session
         "isEmergency": true
     }
 }
+
+
+# Update 2.0
+
+Install App
+      │
+      ▼
+Tap SOS
+      │
+      ▼
+Enter Name
+Enter Phone
+Allow GPS
+      │
+      ▼
+POST /auth/emergency-login
+      │
+      ▼
+Generate Emergency JWT
+      │
+      ▼
+Frontend stores JWT
+      │
+      ▼
+Every future request
+Authorization: Bearer <Emergency Token>
+

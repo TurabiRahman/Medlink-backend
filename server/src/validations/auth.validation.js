@@ -48,12 +48,28 @@ const loginSchema = z.object({
 });
 
 const emergencyLoginSchema = z.object({
+    name: z
+        .string()
+        .trim()
+        .min(2)
+        .max(100),
+
     phone: z
         .string()
         .regex(
             /^\+8801[3-9]\d{8}$/,
-            "Phone number must be in the format +880XXXXXXXXXX"
+            "Phone number must be in the format +8801XXXXXXXXX"
         ),
+
+    latitude: z
+        .number()
+        .min(-90)
+        .max(90),
+
+    longitude: z
+        .number()
+        .min(-180)
+        .max(180),
 });
 
 module.exports = {
