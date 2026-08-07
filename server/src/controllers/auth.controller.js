@@ -87,10 +87,16 @@ const startEmergencySession = async (req, res) => {
             statusCode: 200,
 
             data: {
+                name: result.name,
                 phone: result.phone,
+
+                latitude: result.latitude,
+                longitude: result.longitude,
+
                 isEmergency: result.isEmergency,
             },
 
+            token: result.token,
         });
 
     } catch (error) {
@@ -106,8 +112,6 @@ const startEmergencySession = async (req, res) => {
     }
 
 };
-
-
 
 const logout = async (req, res) => {
 

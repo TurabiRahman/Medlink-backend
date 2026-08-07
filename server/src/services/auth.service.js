@@ -142,13 +142,39 @@ const signup = async ({ email, phone, password, userType }) => {
 
 // I will use it for my emergency login feature
 
-const startEmergencySession = async ({ phone }) => {
+const startEmergencySession = async ({
+    name,
+    phone,
+    latitude,
+    longitude,
+}) => {
 
-    return {
+    const payload = {
+        sessionType: "EMERGENCY",
+
+        name,
         phone,
-        isEmergency: true,
+
+        latitude,
+        longitude,
     };
 
+    const accessToken = generateAccessToken(payload);
+
+    return {
+        name,
+        phone,
+        latitude,
+        longitude,
+
+        isEmergency: true,
+
+        token: {
+            accessToken,
+            expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS) || 3600,
+            tokenType: "Bearer",
+        },
+    };
 };
 
 const logout = async () => {
