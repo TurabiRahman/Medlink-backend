@@ -29,3 +29,5 @@ npm-debug.log*
 
 # coverage
 coverage/
+
+docker/

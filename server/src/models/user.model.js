@@ -388,6 +388,33 @@ const upsertUserLocation = async ({
 
 };
 
+const createEmergencyProfile = async ({
+    userId,
+    name,
+}) => {
+
+    const query = `
+        INSERT INTO user_profiles
+        (
+            user_id,
+            first_name
+        )
+        VALUES
+        (
+            $1,
+            $2
+        )
+        RETURNING *;
+    `;
+
+    const result = await pool.query(query, [
+        userId,
+        name,
+    ]);
+
+    return result.rows[0];
+};
+
 module.exports = {
     createUserProfile,
     getProfileByUserId,
@@ -398,4 +425,5 @@ module.exports = {
     deleteUser,
     getUserLocation,
     upsertUserLocation,
+    createEmergencyProfile,
 };

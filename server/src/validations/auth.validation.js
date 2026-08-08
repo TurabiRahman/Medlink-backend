@@ -32,20 +32,35 @@ const signupSchema = z.object({
   ]),
 });
 
-const loginSchema = z.object({
-  email: z
-    .email("Please provide a valid email address")
-    .trim(),
+const loginSchema = z
+  .object({
+    email: z
+      .email("Please provide a valid email address")
+      .trim()
+      .optional(),
 
-  password: z
-    .string()
-    .min(1, "Password is required"),
+    phone: z
+      .string()
+      .trim()
+      .min(1, "Phone number is required")
+      .optional(),
 
-  rememberMe: z
-    .boolean()
-    .optional()
-    .default(false),
-});
+    password: z
+      .string()
+      .min(1, "Password is required"),
+
+    rememberMe: z
+      .boolean()
+      .optional()
+      .default(false),
+  })
+  .refine(
+    (data) => data.email || data.phone,
+    {
+      message: "Email or phone number is required",
+      path: ["email"],
+    }
+  );
 
 const emergencyLoginSchema = z.object({
     name: z

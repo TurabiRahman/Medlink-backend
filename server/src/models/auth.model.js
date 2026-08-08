@@ -113,6 +113,44 @@ const hasUserProfile = async (userId) => {
     return result.rowCount > 0;
 };
 
+const createEmergencyUser = async ({
+    phone,
+    passwordHash,
+}) => {
+
+    const query = `
+        INSERT INTO users
+        (
+            role_type,
+            email,
+            phone,
+            password_hash
+        )
+        VALUES
+        (
+            'CUSTOMER',
+            NULL,
+            $1,
+            $2
+        )
+        RETURNING
+            id,
+            role_type,
+            email,
+            phone,
+            is_verified,
+            is_active,
+            created_at;
+    `;
+
+    const result = await pool.query(query, [
+        phone,
+        passwordHash,
+    ]);
+
+    return result.rows[0];
+};
+
 
 module.exports = {
   findUserByEmail,
@@ -120,4 +158,5 @@ module.exports = {
   createUser,
   updateLastLogin,
   hasUserProfile,
+  createEmergencyUser,
 };

@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 const {
   findUserByEmail,
@@ -6,6 +7,7 @@ const {
   createUser,
   updateLastLogin,
   hasUserProfile,
+  createEmergencyUser,
 } = require("../models/auth.model");
 
 const {
@@ -13,10 +15,21 @@ const {
   generateRefreshToken,
 } = require("../utils/jwt");
 
-const login = async ({ email, password }) => {
+const {
+    createEmergencyProfile,
+    upsertUserLocation,
+} = require("../models/user.model");
+
+const login = async ({ email, phone, password }) => {
 
     // Find user
-    const user = await findUserByEmail(email);
+    let user;
+
+    if (email) {
+        user = await findUserByEmail(email);
+    } else if (phone) {
+        user = await findUserByPhone(phone);
+    }
 
     if (!user) {
         const error = new Error("User not found");
@@ -142,6 +155,68 @@ const signup = async ({ email, phone, password, userType }) => {
 
 // I will use it for my emergency login feature
 
+// const startEmergencySession = async ({
+//     name,
+//     phone,
+//     latitude,
+//     longitude,
+// }) => {
+
+//     const payload = {
+//         sessionType: "EMERGENCY",
+
+//         name,
+//         phone,
+
+//         latitude,
+//         longitude,
+//     };
+
+//     // 1. Create user
+
+//     // 2. get user id
+
+//     // 3. Generate access token
+
+//     // 4. async Store user location
+
+//     //  5. return response
+//     // {
+//     //   data: {
+//     //      name,
+//     //     phone,
+//     //     latitude,
+//     //     longitude,
+
+//     //     isEmergency: true,
+
+//     //     token: {
+//     //         accessToken,
+//     //         expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS) || 3600,
+//     //         tokenType: "Bearer",
+//     //     },
+//     //  controller: message: "Emergency session started. Use your phone number as passsword to login later",
+//     // }
+
+
+//     const accessToken = generateAccessToken(payload);
+
+//     return {
+//         name,
+//         phone,
+//         latitude,
+//         longitude,
+
+//         isEmergency: true,
+
+//         token: {
+//             accessToken,
+//             expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS) || 3600,
+//             tokenType: "Bearer",
+//         },
+//     };
+// };
+
 const startEmergencySession = async ({
     name,
     phone,
@@ -149,29 +224,96 @@ const startEmergencySession = async ({
     longitude,
 }) => {
 
-    const payload = {
-        sessionType: "EMERGENCY",
+    // 1. Check whether this phone already belongs to a user
+    let user = await findUserByPhone(phone);
 
-        name,
-        phone,
+    let temporaryPassword = null;
+    let isNewEmergencyUser = false;
 
+    // 2. Existing user → reuse existing account
+    if (user) {
+
+        if (!user.is_active) {
+            const error = new Error("Account has been deactivated");
+            error.statusCode = 403;
+            error.errorCode = "ACCOUNT_DISABLED";
+            throw error;
+        }
+
+    }
+
+    // 3. New emergency user → create CUSTOMER account
+    else {
+
+        // Generate temporary password
+        temporaryPassword = `SOS-${crypto.randomBytes(6).toString("hex")}`;
+
+        // Hash temporary password
+        const passwordHash = await bcrypt.hash(
+            temporaryPassword,
+            12
+        );
+
+        user = await createEmergencyUser({
+            phone,
+            passwordHash,
+        });
+
+        isNewEmergencyUser = true;
+
+        // Store emergency user's name
+        await createEmergencyProfile({
+            userId: user.id,
+            name,
+        });
+    }
+
+    // 4. Store/update user's current location
+    const location = await upsertUserLocation({
+        userId: user.id,
         latitude,
         longitude,
+    });
+
+    // 5. Update last login
+    const updatedLogin = await updateLastLogin(user.id);
+
+    // 6. Generate emergency access token
+    const payload = {
+        userId: user.id,
+        role: user.role_type,
+        sessionType: "EMERGENCY",
+        isEmergency: true,
     };
 
     const accessToken = generateAccessToken(payload);
 
+    // 7. Return emergency session
     return {
+        user: {
+            id: user.id,
+            phone: user.phone,
+            roleType: user.role_type,
+            lastLogin: updatedLogin.last_login,
+        },
+
         name,
-        phone,
-        latitude,
-        longitude,
+
+        location: {
+            latitude: location.latitude,
+            longitude: location.longitude,
+        },
 
         isEmergency: true,
 
+        isNewEmergencyUser,
+
+        temporaryPassword,
+
         token: {
             accessToken,
-            expiresIn: Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS) || 3600,
+            expiresIn:
+                Number(process.env.JWT_ACCESS_EXPIRES_IN_SECONDS) || 3600,
             tokenType: "Bearer",
         },
     };

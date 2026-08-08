@@ -26,6 +26,7 @@ router.post(
     authController.startEmergencySession
 );
 
+
 router.post(
     "/logout",
     authenticate,

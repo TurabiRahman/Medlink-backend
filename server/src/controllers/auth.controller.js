@@ -74,44 +74,44 @@ const login = async (req, res) => {
 };
 
 
-const startEmergencySession = async (req, res) => {
+// const startEmergencySession = async (req, res) => {
 
-    try {
+//     try {
 
-        const result = await authService.startEmergencySession(req.body);
+//         const {  } = await authService.startEmergencySession(req.body);
 
-        return res.status(200).json({
+//         return res.status(200).json({
 
-            success: true,
-            message: "Emergency session started",
-            statusCode: 200,
+//             success: true,
+//             message: "Emergency session started", // updated
+//             statusCode: 200,
 
-            data: {
-                name: result.name,
-                phone: result.phone,
+//             data: {
+//                 name: result.name,
+//                 phone: result.phone,
 
-                latitude: result.latitude,
-                longitude: result.longitude,
+//                 latitude: result.latitude,
+//                 longitude: result.longitude,
 
-                isEmergency: result.isEmergency,
-            },
+//                 isEmergency: result.isEmergency,
+//             },
 
-            token: result.token,
-        });
+//             token: result.token,
+//         });
 
-    } catch (error) {
+//     } catch (error) {
 
-        return res.status(500).json({
+//         return res.status(500).json({
 
-            success: false,
-            message: "Internal Server Error",
-            statusCode: 500,
+//             success: false,
+//             message: "Internal Server Error",
+//             statusCode: 500,
 
-        });
+//         });
 
-    }
+//     }
 
-};
+// };
 
 const logout = async (req, res) => {
 
@@ -124,6 +124,69 @@ const logout = async (req, res) => {
     });
 };
 
+
+const startEmergencySession = async (req, res) => {
+
+    try {
+
+        const result =
+            await authService.startEmergencySession(req.body);
+
+        return res.status(200).json({
+
+            success: true,
+            message: "Emergency session started",
+            statusCode: 200,
+
+            data: {
+
+                userId: result.user.id,
+
+                name: result.name,
+
+                phone: result.user.phone,
+
+                roleType: result.user.roleType,
+
+                latitude: result.location.latitude,
+
+                longitude: result.location.longitude,
+
+                isEmergency: result.isEmergency,
+
+                isNewEmergencyUser:
+                    result.isNewEmergencyUser,
+
+                temporaryPassword:
+                    result.temporaryPassword,
+
+            },
+
+            token: result.token,
+        });
+
+    } catch (error) {
+
+        return res.status(
+            error.statusCode || 500
+        ).json({
+
+            success: false,
+
+            message:
+                error.message ||
+                "Internal Server Error",
+
+            statusCode:
+                error.statusCode || 500,
+
+            ...(error.errorCode && {
+                errorCode: error.errorCode,
+            }),
+
+        });
+    }
+};
 
 module.exports = {
   signup,
