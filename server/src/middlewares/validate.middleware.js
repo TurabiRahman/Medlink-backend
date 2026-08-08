@@ -21,6 +21,51 @@
 
 // module.exports = validate;
 
+
+//---------> used after hospital validation update
+
+// const validate = (schema, source = "body") => {
+
+//     return async (req, res, next) => {
+
+//         try {
+
+//             const validatedData =
+//                 await schema.parseAsync(req[source]);
+
+//             req[source] = validatedData;
+
+//             next();
+
+//         } catch (error) {
+
+//             return res.status(400).json({
+
+//                 success: false,
+
+//                 message: "Validation error",
+
+//                 statusCode: 400,
+
+//                 errors: error.issues.map((issue) => ({
+
+//                     field: issue.path[0],
+
+//                     message: issue.message,
+
+//                 })),
+
+//             });
+
+//         }
+
+//     };
+
+// };
+
+
+//-----------> used after ambulance validation update
+
 const validate = (schema, source = "body") => {
 
     return async (req, res, next) => {
@@ -46,7 +91,7 @@ const validate = (schema, source = "body") => {
 
                 errors: error.issues.map((issue) => ({
 
-                    field: issue.path[0],
+                    field: issue.path.join("."),
 
                     message: issue.message,
 
@@ -59,6 +104,5 @@ const validate = (schema, source = "body") => {
     };
 
 };
-
 
 module.exports = validate;
