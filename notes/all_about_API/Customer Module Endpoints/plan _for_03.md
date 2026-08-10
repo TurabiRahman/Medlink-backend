@@ -219,3 +219,24 @@ Ambulance module
 /api/v1/ambulances
 /api/v1/ambulances/nearby
 /api/v1/ambulances/:ambulanceId
+
+
+# Phase 3.4 
+
+Event Module 
+
+GET /api/events
+GET /api/events/:eventId
+
+# PHASE 3.5
+
+Bed Reservations
+
+
+Method	Endpoint	                                 Purpose
+POST	/api/v1/reservations	                        Create a bed reservation
+GET	/api/v1/reservations	                        Get reservations
+GET	/api/v1/reservations/:reservationId  	      Get one reservation
+PUT	/api/v1/reservations/:reservationId	         Update reservation
+PUT	/api/v1/reservations/:reservationId/cancel	Cancel reservation
+
