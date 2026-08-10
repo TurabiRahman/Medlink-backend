@@ -240,3 +240,58 @@ GET	/api/v1/reservations/:reservationId  	      Get one reservation
 PUT	/api/v1/reservations/:reservationId	         Update reservation
 PUT	/api/v1/reservations/:reservationId/cancel	Cancel reservation
 
+
+
+Event exists?
+        ↓
+Event belongs to logged-in user?
+        ↓
+Event still active?
+        ↓
+Hospital exists and is OPEN?
+        ↓
+Ward belongs to hospital?
+        ↓
+Bed belongs to hospital + ward?
+        ↓
+Bed AVAILABLE?
+        ↓
+No existing active reservation?
+        ↓
+INSERT reservation
+        ↓
+AVAILABLE → RESERVED
+
+
+
+
+# Phase 3.6  
+
+POST /api/ai-medical/consult
+
+Purpose:
+
+Customer
+   ↓
+Describe medical condition
+   ↓
+MedLink Backend
+   ↓
+Gemini API
+   ↓
+AI analyzes the situation
+   ↓
+Backend structures response
+   ↓
+Customer
+
+And eventually this response can be connected to:
+
+Nearby hospitals
+Available beds
+Ambulances
+Blood donors
+
+This is the most interesting part, but we should not build it first.
+
+First I ran npm install @google/genai this command inside my server
