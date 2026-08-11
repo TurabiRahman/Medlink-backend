@@ -91,7 +91,7 @@ const login = async ({ email, phone, password }) => {
     };
 };
 
-const signup = async ({ email, phone, password, userType }) => {
+const signup = async ({ email, phone, password }) => {
   // Check if email already exists
   const existingEmail = await findUserByEmail(email);
 
@@ -125,7 +125,7 @@ const signup = async ({ email, phone, password, userType }) => {
 
   // Create user
   const user = await createUser({
-    roleType: userType,
+    roleType: "CUSTOMER",
     email,
     phone,
     passwordHash,

@@ -23,14 +23,17 @@ const signupSchema = z.object({
       /[!@#$%^&*]/,
       "Password must contain at least one special character"
     ),
+   
 
-  userType: z.enum([
-    "CUSTOMER",
-    "SUPER_ADMIN",
-    "HOSPITAL_ADMIN",
-    "AMBULANCE_ADMIN",
-  ]),
-});
+
+   // ------------> I removed the userType validation because I want only to allow CUSTOMER to signup. 
+  // userType: z.enum([
+  //   "CUSTOMER",
+  //   "SUPER_ADMIN",
+  //   "HOSPITAL_ADMIN",
+  //   "AMBULANCE_ADMIN",
+  // ]),
+}).strict();
 
 const loginSchema = z
   .object({
