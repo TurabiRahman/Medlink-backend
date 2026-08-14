@@ -8,6 +8,9 @@ const {
     getMyAssignments,
     getDashboard,
     getActiveCases,
+    getReservations,
+    getReservationById,
+    approveReservation
 } = require("../controllers/hospital-admin.controller");
 
 const router = express.Router();
@@ -46,6 +49,29 @@ router.get(
     authenticate,
     authorize("HOSPITAL_ADMIN"),
     getActiveCases
+);
+
+/// ------> we will write code for reservation
+
+router.get(
+    "/reservations",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    getReservations
+);
+
+router.get(
+    "/reservations/:reservationId",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    getReservationById
+);
+
+router.put(
+    "/reservations/:reservationId/approve",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    approveReservation
 );
 
 module.exports = router;

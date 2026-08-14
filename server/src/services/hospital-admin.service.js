@@ -5,7 +5,7 @@ const hospitalModel = require("../models/hospital-admin.model");
 // ============================================================
 
 const getMyHospital = async (userId) => {
-    const hospital = await hospitalModel.getHospitalByAdminId(userId);
+    const hospital = await hospitalModel.getId(userId);
 
     if (!hospital) {
         const error = new Error("No hospital assignment found");
@@ -58,9 +58,85 @@ const getActiveCases = async (userId) => {
     );
 };
 
+
+// ----------------> we will code for reservations from now
+
+const getHospitalReservations = async (userId) => {
+    const hospital = await hospitalModel.getHospitalByAdminId(userId);
+
+    if (!hospital) {
+        const error = new Error(
+            "No hospital assignment found for this admin"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const reservations =
+        await hospitalModel.getReservationsByHospital(
+            hospital.hospital_id
+        );
+
+    return reservations;
+};
+
+
+const getHospitalReservationById = async (
+    userId,
+    reservationId
+) => {
+    const hospital = await hospitalModel.getHospitalByAdminId(userId);
+
+    if (!hospital) {
+        const error = new Error(
+            "No hospital assignment found for this admin"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const reservation =
+        await hospitalModel.getReservationById(
+            reservationId,
+            hospital.hospital_id
+        );
+
+    if (!reservation) {
+        const error = new Error("Reservation not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return reservation;
+};
+
+
+const approveHospitalReservation = async (
+    userId,
+    reservationId
+) => {
+    const hospital = await hospitalModel.getHospitalByAdminId(userId);
+
+    if (!hospital) {
+        const error = new Error(
+            "No hospital assignment found for this admin"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return hospitalModel.approveReservation(
+        reservationId,
+        hospital.hospital_id
+    );
+};
+
 module.exports = {
     getMyHospital,
     getMyAssignments,
     getDashboard,
     getActiveCases,
+    getHospitalReservations,
+    getHospitalReservationById,
+    approveHospitalReservation,
 };

@@ -85,9 +85,74 @@ const getActiveCases = async (req, res, next) => {
     }
 };
 
+
+///------> we will code for reservations from now
+
+const getReservations = async (req, res, next) => {
+    try {
+        const reservations =
+            await hospitalService.getHospitalReservations(
+                req.user.userId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message: "Hospital reservations fetched successfully",
+            statusCode: 200,
+            count: reservations.length,
+            data: reservations,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+const getReservationById = async (req, res, next) => {
+    try {
+        const reservation =
+            await hospitalService.getHospitalReservationById(
+                req.user.userId,
+                req.params.reservationId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message: "Reservation details fetched successfully",
+            statusCode: 200,
+            data: reservation,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+const approveReservation = async (req, res, next) => {
+    try {
+        const reservation =
+            await hospitalService.approveHospitalReservation(
+                req.user.userId,
+                req.params.reservationId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message: "Reservation approved successfully",
+            statusCode: 200,
+            data: reservation,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getMyHospital,
     getMyAssignments,
     getDashboard,
     getActiveCases,
+    getReservations,
+    getReservationById,
+    approveReservation,
 };

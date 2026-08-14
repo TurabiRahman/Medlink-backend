@@ -220,10 +220,271 @@ const getActiveCasesByHospitalId = async (hospitalId) => {
     return result.rows;
 };
 
+
+/// ------------> we will write code for reservation
+
+
+const getReservationsByHospital = async (hospitalId) => {
+    const query = `
+        SELECT
+            r.id AS reservation_id,
+            r.medical_event_id,
+            r.user_id,
+            r.hospital_id,
+            r.ward_id,
+            r.bed_id,
+            r.reservation_mode,
+            r.reservation_status,
+            r.requested_at,
+            r.approved_at,
+            r.created_at,
+            r.updated_at,
+
+            me.user_description,
+            me.severity,
+            me.event_status,
+            me.is_emergency,
+            me.event_location_latitude,
+            me.event_location_longitude,
+
+            hw.ward_name,
+
+            hb.bed_number,
+            hb.bed_status
+
+        FROM reservations r
+
+        INNER JOIN medical_events me
+            ON r.medical_event_id = me.id
+
+        INNER JOIN hospital_wards hw
+            ON r.ward_id = hw.id
+
+        LEFT JOIN hospital_beds hb
+            ON r.bed_id = hb.id
+
+        WHERE r.hospital_id = $1
+
+        ORDER BY r.requested_at DESC;
+    `;
+
+    const { rows } = await pool.query(query, [hospitalId]);
+
+    return rows;
+};
+
+
+const getReservationById = async (reservationId, hospitalId) => {
+    const query = `
+        SELECT
+            r.id AS reservation_id,
+            r.medical_event_id,
+            r.user_id,
+            r.hospital_id,
+            r.ward_id,
+            r.bed_id,
+            r.reservation_mode,
+            r.reservation_status,
+            r.requested_at,
+            r.approved_at,
+            r.created_at,
+            r.updated_at,
+
+            me.user_description,
+            me.severity,
+            me.event_status,
+            me.is_emergency,
+            me.event_location_latitude,
+            me.event_location_longitude,
+
+            hw.ward_name,
+            hw.description AS ward_description,
+
+            hb.bed_number,
+            hb.bed_status
+
+        FROM reservations r
+
+        INNER JOIN medical_events me
+            ON r.medical_event_id = me.id
+
+        INNER JOIN hospital_wards hw
+            ON r.ward_id = hw.id
+
+        LEFT JOIN hospital_beds hb
+            ON r.bed_id = hb.id
+
+        WHERE r.id = $1
+          AND r.hospital_id = $2
+
+        LIMIT 1;
+    `;
+
+    const { rows } = await pool.query(query, [
+        reservationId,
+        hospitalId,
+    ]);
+
+    return rows[0] || null;
+};
+
+
+const approveReservation = async (reservationId, hospitalId) => {
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        /*
+         * Lock the reservation so two hospital admins/processes
+         * cannot approve it simultaneously.
+         */
+        const reservationResult = await client.query(
+            `
+            SELECT
+                id,
+                hospital_id,
+                ward_id,
+                bed_id,
+                reservation_status
+            FROM reservations
+            WHERE id = $1
+              AND hospital_id = $2
+            FOR UPDATE;
+            `,
+            [reservationId, hospitalId]
+        );
+
+        if (reservationResult.rows.length === 0) {
+            const error = new Error("Reservation not found");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const reservation = reservationResult.rows[0];
+
+        if (reservation.reservation_status !== "PENDING") {
+            const error = new Error(
+                "Only pending reservations can be approved"
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        if (!reservation.bed_id) {
+            const error = new Error(
+                "Reservation does not have a bed assigned"
+            );
+            error.statusCode = 400;
+            throw error;
+        }
+
+        /*
+         * Lock the bed as well.
+         */
+        const bedResult = await client.query(
+            `
+            SELECT
+                id,
+                hospital_id,
+                ward_id,
+                bed_status
+            FROM hospital_beds
+            WHERE id = $1
+              AND hospital_id = $2
+              AND ward_id = $3
+            FOR UPDATE;
+            `,
+            [
+                reservation.bed_id,
+                hospitalId,
+                reservation.ward_id,
+            ]
+        );
+
+        if (bedResult.rows.length === 0) {
+            const error = new Error(
+                "Assigned bed was not found"
+            );
+            error.statusCode = 404;
+            throw error;
+        }
+
+        const bed = bedResult.rows[0];
+
+        // if (bed.bed_status !== "AVAILABLE") {
+        //     const error = new Error(
+        //         "Assigned bed is not available"
+        //     );
+        //     error.statusCode = 400;
+        //     throw error;
+        // }
+
+        /*
+         * Mark the bed as RESERVED.
+         *
+         * The patient has a reservation now, but has not
+         * necessarily occupied the bed yet.
+         */
+        await client.query(
+            `
+            UPDATE hospital_beds
+            SET
+                bed_status = 'RESERVED',
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1;
+            `,
+            [reservation.bed_id]
+        );
+
+        /*
+         * Approve the reservation.
+         */
+        const updatedReservationResult = await client.query(
+            `
+            UPDATE reservations
+            SET
+                reservation_status = 'APPROVED',
+                approved_at = CURRENT_TIMESTAMP,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $1
+            RETURNING
+                id AS reservation_id,
+                medical_event_id,
+                user_id,
+                hospital_id,
+                ward_id,
+                bed_id,
+                reservation_mode,
+                reservation_status,
+                requested_at,
+                approved_at,
+                created_at,
+                updated_at;
+            `,
+            [reservationId]
+        );
+
+        await client.query("COMMIT");
+
+        return updatedReservationResult.rows[0];
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
+};
+
+
 module.exports = {
     getHospitalIdByAdminId,
     getHospitalByAdminId,
     getAssignmentsByAdminId,
     getDashboardByAdminId,
     getActiveCasesByHospitalId,
+    getReservationsByHospital,
+    getReservationById,
+    approveReservation,
 };
