@@ -420,6 +420,8 @@ const approveReservation = async (reservationId, hospitalId) => {
         //     throw error;
         // }
 
+        
+
         /*
          * Mark the bed as RESERVED.
          *
