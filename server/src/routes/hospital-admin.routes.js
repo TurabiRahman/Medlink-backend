@@ -16,6 +16,11 @@ const {
     approveReservation,
     getBeds,
     updateBedStatus,
+    getPayments,
+    getPaymentById,
+    createPayment,
+    getPatientPayments,
+    updatePayment,
 } = require("../controllers/hospital-admin.controller");
 
 const router = express.Router();
@@ -96,6 +101,49 @@ router.put(
     authorize("HOSPITAL_ADMIN"),
     validate(updateBedStatusSchema),
     updateBedStatus
+);
+
+// ============================================================
+// HOSPITAL PAYMENTS
+// ============================================================
+
+router.get(
+    "/payments",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    getPayments
+);
+
+
+router.get(
+    "/payments/:paymentId",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    getPaymentById
+);
+
+
+router.post(
+    "/payments",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    createPayment
+);
+
+
+router.get(
+    "/payments/patient/:patientId",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    getPatientPayments
+);
+
+
+router.put(
+    "/payments/:paymentId",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    updatePayment
 );
 
 module.exports = router;

@@ -532,6 +532,268 @@ const updateBedStatus = async (
     return rows[0] || null;
 };
 
+// ============================================================
+// HOSPITAL PAYMENTS
+// ============================================================
+
+// GET ALL PAYMENTS FOR ADMIN'S HOSPITAL
+const getPaymentsByHospitalId = async (hospitalId) => {
+    const result = await pool.query(
+        `
+        SELECT
+            p.id AS payment_id,
+            p.reservation_id,
+            p.total_amount,
+            p.payment_method,
+            p.payment_status,
+            p.paid_at,
+            p.created_at,
+            
+
+            r.medical_event_id,
+            r.user_id AS patient_id,
+            r.reservation_mode,
+            r.reservation_status,
+            r.requested_at,
+            r.approved_at,
+
+            u.phone AS patient_phone,
+
+            up.first_name AS patient_first_name,
+            up.last_name AS patient_last_name
+
+        FROM payments p
+
+        INNER JOIN reservations r
+            ON p.reservation_id = r.id
+
+        INNER JOIN users u
+            ON r.user_id = u.id
+
+        LEFT JOIN user_profiles up
+            ON r.user_id = up.user_id
+
+        WHERE r.hospital_id = $1
+
+        ORDER BY p.created_at DESC
+        `,
+        [hospitalId]
+    );
+
+    return result.rows;
+};
+
+
+// GET ONE PAYMENT
+const getPaymentById = async (paymentId, hospitalId) => {
+    const result = await pool.query(
+        `
+        SELECT
+            p.id AS payment_id,
+            p.reservation_id,
+            p.total_amount,
+            p.payment_method,
+            p.payment_status,
+            p.paid_at,
+            p.created_at,
+
+            r.medical_event_id,
+            r.user_id AS patient_id,
+            r.hospital_id,
+            r.ward_id,
+            r.bed_id,
+            r.reservation_mode,
+            r.reservation_status,
+            r.requested_at,
+            r.approved_at,
+
+            u.phone AS patient_phone,
+
+            up.first_name AS patient_first_name,
+            up.last_name AS patient_last_name,
+
+            h.hospital_name,
+
+            hw.ward_name,
+
+            hb.bed_number
+
+        FROM payments p
+
+        INNER JOIN reservations r
+            ON p.reservation_id = r.id
+
+        INNER JOIN users u
+            ON r.user_id = u.id
+
+        LEFT JOIN user_profiles up
+            ON r.user_id = up.user_id
+
+        INNER JOIN hospitals h
+            ON r.hospital_id = h.id
+
+        INNER JOIN hospital_wards hw
+            ON r.ward_id = hw.id
+
+        LEFT JOIN hospital_beds hb
+            ON r.bed_id = hb.id
+
+        WHERE p.id = $1
+          AND r.hospital_id = $2
+
+        LIMIT 1
+        `,
+        [paymentId, hospitalId]
+    );
+
+    return result.rows[0] || null;
+};
+
+
+// CREATE PAYMENT
+const createPayment = async ({
+    reservationId,
+    totalAmount,
+    paymentMethod,
+    paymentStatus,
+    paidAt,
+}) => {
+    const result = await pool.query(
+        `
+        INSERT INTO payments (
+            reservation_id,
+            total_amount,
+            payment_method,
+            payment_status,
+            paid_at
+        )
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING
+            id AS payment_id,
+            reservation_id,
+            total_amount,
+            payment_method,
+            payment_status,
+            paid_at,
+            created_at
+        `,
+        [
+            reservationId,
+            totalAmount,
+            paymentMethod,
+            paymentStatus,
+            paidAt,
+        ]
+    );
+
+    return result.rows[0];
+};
+
+
+// GET PAYMENTS FOR A PATIENT
+const getPaymentsByPatientId = async (
+    patientId,
+    hospitalId
+) => {
+    const result = await pool.query(
+        `
+        SELECT
+            p.id AS payment_id,
+            p.reservation_id,
+            p.total_amount,
+            p.payment_method,
+            p.payment_status,
+            p.paid_at,
+            p.created_at,
+
+            r.medical_event_id,
+            r.user_id AS patient_id,
+            r.reservation_mode,
+            r.reservation_status,
+            r.requested_at,
+            r.approved_at,
+
+            h.hospital_name,
+
+            hw.ward_name,
+
+            hb.bed_number
+
+        FROM payments p
+
+        INNER JOIN reservations r
+            ON p.reservation_id = r.id
+
+        INNER JOIN hospitals h
+            ON r.hospital_id = h.id
+
+        INNER JOIN hospital_wards hw
+            ON r.ward_id = hw.id
+
+        LEFT JOIN hospital_beds hb
+            ON r.bed_id = hb.id
+
+        WHERE r.user_id = $1
+          AND r.hospital_id = $2
+
+        ORDER BY p.created_at DESC
+        `,
+        [patientId, hospitalId]
+    );
+
+    return result.rows;
+};
+
+
+// UPDATE PAYMENT
+const updatePayment = async (
+    paymentId,
+    hospitalId,
+    {
+        totalAmount,
+        paymentMethod,
+        paymentStatus,
+        paidAt,
+    }
+) => {
+    const result = await pool.query(
+        `
+        UPDATE payments p
+
+        SET
+            total_amount = COALESCE($3, p.total_amount),
+            payment_method = COALESCE($4, p.payment_method),
+            payment_status = COALESCE($5, p.payment_status),
+            paid_at = COALESCE($6, p.paid_at)
+
+        FROM reservations r
+
+        WHERE p.id = $1
+          AND p.reservation_id = r.id
+          AND r.hospital_id = $2
+
+        RETURNING
+            p.id AS payment_id,
+            p.reservation_id,
+            p.total_amount,
+            p.payment_method,
+            p.payment_status,
+            p.paid_at,
+            p.created_at,
+        `,
+        [
+            paymentId,
+            hospitalId,
+            totalAmount,
+            paymentMethod,
+            paymentStatus,
+            paidAt,
+        ]
+    );
+
+    return result.rows[0] || null;
+};
+
 module.exports = {
     getHospitalIdByAdminId,
     getHospitalByAdminId,
@@ -543,4 +805,9 @@ module.exports = {
     approveReservation,
     getBedsByHospital,
     updateBedStatus,
+    getPaymentsByHospitalId,
+    getPaymentById,
+    createPayment,
+    getPaymentsByPatientId,
+    updatePayment,
 };
