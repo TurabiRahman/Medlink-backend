@@ -2,6 +2,9 @@ const express = require("express");
 
 const authenticate = require("../middlewares/auth.middleware");
 const authorize = require("../middlewares/authorize.middleware");
+const validate = require("../middlewares/validate.middleware");
+
+const { updateBedStatusSchema } = require("../validations/hospital-admin.validation");
 
 const {
     getMyHospital,
@@ -10,7 +13,9 @@ const {
     getActiveCases,
     getReservations,
     getReservationById,
-    approveReservation
+    approveReservation,
+    getBeds,
+    updateBedStatus,
 } = require("../controllers/hospital-admin.controller");
 
 const router = express.Router();
@@ -72,6 +77,25 @@ router.put(
     authenticate,
     authorize("HOSPITAL_ADMIN"),
     approveReservation
+);
+
+
+/// ------> we will write code for beds
+
+router.get(
+    "/beds",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    getBeds
+);
+
+// PUT /api/v1/hospital/beds/:bedId/status
+router.put(
+    "/beds/:bedId/status",
+    authenticate,
+    authorize("HOSPITAL_ADMIN"),
+    validate(updateBedStatusSchema),
+    updateBedStatus
 );
 
 module.exports = router;

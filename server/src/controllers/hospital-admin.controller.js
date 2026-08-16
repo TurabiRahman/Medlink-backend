@@ -147,6 +147,43 @@ const approveReservation = async (req, res, next) => {
     }
 };
 
+const getBeds = async (req, res, next) => {
+    try {
+        const beds = await hospitalService.getHospitalBeds(
+            req.user.userId
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Hospital beds fetched successfully",
+            statusCode: 200,
+            count: beds.length,
+            data: beds,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const updateBedStatus = async (req, res, next) => {
+    try {
+        const bed = await hospitalService.updateHospitalBedStatus(
+            req.user.userId,
+            req.params.bedId,
+            req.body.bedStatus
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Bed status updated successfully",
+            statusCode: 200,
+            data: bed,
+        });
+    } catch (error) {
+        next(error);
+    }
+}; 
+
 module.exports = {
     getMyHospital,
     getMyAssignments,
@@ -155,4 +192,7 @@ module.exports = {
     getReservations,
     getReservationById,
     approveReservation,
+    getBeds,
+    updateBedStatus,
 };
+

@@ -131,6 +131,54 @@ const approveHospitalReservation = async (
     );
 };
 
+const getHospitalBeds = async (userId) => {
+    const hospital = await hospitalModel.getHospitalByAdminId(userId);
+
+    if (!hospital) {
+        const error = new Error(
+            "No hospital assignment found for this admin"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return hospitalModel.getBedsByHospital(
+        hospital.hospital_id
+    );
+};
+
+const updateHospitalBedStatus = async (
+    userId,
+    bedId,
+    bedStatus
+) => {
+    const hospital = await hospitalModel.getHospitalByAdminId(userId);
+
+    if (!hospital) {
+        const error = new Error(
+            "No hospital assignment found for this admin"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const bed = await hospitalModel.updateBedStatus(
+        bedId,
+        hospital.hospital_id,
+        bedStatus
+    );
+
+    if (!bed) {
+        const error = new Error(
+            "Bed not found in your hospital"
+        );
+        error.statusCode = 404;
+        throw error;
+    }
+
+    return bed;
+};
+
 module.exports = {
     getMyHospital,
     getMyAssignments,
@@ -139,4 +187,7 @@ module.exports = {
     getHospitalReservations,
     getHospitalReservationById,
     approveHospitalReservation,
+    getHospitalBeds,
+    updateHospitalBedStatus,
 };
+

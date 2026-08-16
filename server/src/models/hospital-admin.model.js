@@ -479,6 +479,58 @@ const approveReservation = async (reservationId, hospitalId) => {
     }
 };
 
+const getBedsByHospital = async (hospitalId) => {
+    const query = `
+        SELECT
+            hb.id AS bed_id,
+            hb.bed_number,
+            hb.bed_status,
+            hw.id AS ward_id,
+            hw.ward_name,
+            hb.created_at,
+            hb.updated_at
+        FROM hospital_beds hb
+        JOIN hospital_wards hw
+            ON hw.id = hb.ward_id
+        WHERE hb.hospital_id = $1
+        ORDER BY hw.ward_name, hb.bed_number
+    `;
+
+    const { rows } = await pool.query(query, [hospitalId]);
+
+    return rows;
+};
+
+const updateBedStatus = async (
+    bedId,
+    hospitalId,
+    bedStatus
+) => {
+    const query = `
+        UPDATE hospital_beds
+        SET
+            bed_status = $1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+          AND hospital_id = $3
+        RETURNING
+            id AS bed_id,
+            hospital_id,
+            ward_id,
+            bed_number,
+            bed_status,
+            created_at,
+            updated_at
+    `;
+
+    const { rows } = await pool.query(query, [
+        bedStatus,
+        bedId,
+        hospitalId,
+    ]);
+
+    return rows[0] || null;
+};
 
 module.exports = {
     getHospitalIdByAdminId,
@@ -489,4 +541,6 @@ module.exports = {
     getReservationsByHospital,
     getReservationById,
     approveReservation,
+    getBedsByHospital,
+    updateBedStatus,
 };
