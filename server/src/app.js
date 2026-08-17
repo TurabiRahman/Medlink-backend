@@ -11,6 +11,7 @@ const eventRoutes = require("./routes/event.routes");
 const reservationRoutes = require("./routes/reservation.routes");
 const aiMedicalRoutes = require("./routes/ai-medical.routes");
 const hospitalAdminRoutes = require("./routes/hospital-admin.routes");
+const paymentRoutes = require("./routes/payment.routes");
 
 
 
@@ -29,6 +30,7 @@ app.use("/api/v1/events", eventRoutes);
 app.use("/api/v1/reservations", reservationRoutes);
 app.use("/api/v1/ai-medical",aiMedicalRoutes);
 app.use("/api/v1/hospital",hospitalAdminRoutes);
+app.use("/api/v1/payments", paymentRoutes);
 
 
 
