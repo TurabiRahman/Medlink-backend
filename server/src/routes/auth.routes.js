@@ -14,7 +14,7 @@ router.post(
   authController.signup
 );
 
-router.post(
+router.post(    ///http://localhost:3000/api/v1/auth/login
     "/login",
     validate(loginSchema),
     authController.login
