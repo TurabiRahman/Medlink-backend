@@ -13,6 +13,30 @@ POST   /api/v1/admin/hospitals
 PUT    /api/v1/admin/hospitals/:hospitalId
 DELETE /api/v1/admin/hospitals/:hospitalId
 
+
+BEGIN
+  │
+  ├── Create hospital
+  │      ↓
+  │   hospital_id
+  │
+  ├── Hash admin password
+  │
+  ├── Create HOSPITAL_ADMIN user
+  │      ↓
+  │   user_id
+  │
+  ├── Create hospital_admins assignment
+  │      ↓
+  │   hospital_id + user_id
+  │
+COMMIT
+
+If anything fails → ROLLBACK
+
+
+
+
 # Phase 6.3 — Ambulance Provider Management
 
 

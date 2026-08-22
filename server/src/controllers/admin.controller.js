@@ -79,8 +79,142 @@ const updateUserStatus = async (req, res, next) => {
     }
 };
 
+// ============================================================
+// GET ALL HOSPITALS
+// ============================================================
+
+const getAllHospitals = async (req, res, next) => {
+    try {
+        const {
+            limit = 50,
+            offset = 0,
+            status,
+        } = req.query;
+
+        const result =
+            await adminService.getAllHospitals({
+                limit: Number(limit),
+                offset: Number(offset),
+                status,
+            });
+
+        return res.status(200).json({
+            success: true,
+            message: "Hospitals fetched successfully",
+            statusCode: 200,
+            count: result.hospitals.length,
+            total: result.total,
+            data: result.hospitals,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// GET HOSPITAL BY ID
+// ============================================================
+
+const getHospitalById = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const hospital =
+            await adminService.getHospitalById(
+                req.params.hospitalId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Hospital details fetched successfully",
+            statusCode: 200,
+            data: hospital,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// CREATE HOSPITAL
+// ============================================================
+
+const createHospital = async (req, res, next) => {
+    try {
+        const result =
+            await adminService.createHospital(
+                req.body
+            );
+
+        return res.status(201).json({
+            success: true,
+            message:
+                "Hospital and hospital admin created successfully",
+            statusCode: 201,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// UPDATE HOSPITAL
+// ============================================================
+
+const updateHospital = async (req, res, next) => {
+    try {
+        const hospital =
+            await adminService.updateHospital(
+                req.params.hospitalId,
+                req.body
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Hospital updated successfully",
+            statusCode: 200,
+            data: hospital,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// DELETE HOSPITAL
+// ============================================================
+
+const deleteHospital = async (req, res, next) => {
+    try {
+        const deletedHospital =
+            await adminService.deleteHospital(
+                req.params.hospitalId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Hospital deleted successfully",
+            statusCode: 200,
+            data: deletedHospital,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getAllUsers,
     updateUserRole,
     updateUserStatus,
+    getAllHospitals,
+    getHospitalById,
+    createHospital,
+    updateHospital,
+    deleteHospital,
 };
