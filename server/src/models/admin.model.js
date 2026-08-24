@@ -870,6 +870,29 @@ const deleteAmbulanceProvider = async (
     return result.rows[0];
 };
 
+// ============================================================
+// GET ADMIN DASHBOARD
+// ============================================================
+
+const getDashboardStats = async () => {
+    const query = `
+        SELECT
+            (SELECT COUNT(*) FROM users) AS total_users,
+            (SELECT COUNT(*) FROM hospitals) AS total_hospitals,
+            (
+                SELECT COUNT(*)
+                FROM ambulance_providers
+            ) AS total_ambulance_providers,
+            (
+                SELECT COUNT(*)
+                FROM reservations
+            ) AS total_reservations
+    `;
+
+    const result = await pool.query(query);
+
+    return result.rows[0];
+};
 
 
 module.exports = {
@@ -891,4 +914,5 @@ module.exports = {
     createAmbulanceProviderWithAdmin,
     updateAmbulanceProvider,
     deleteAmbulanceProvider,
+    getDashboardStats,
 };

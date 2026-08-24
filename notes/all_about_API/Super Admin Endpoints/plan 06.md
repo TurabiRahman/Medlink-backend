@@ -112,3 +112,45 @@ Expected structure:
     "totalReservations": 8900
   }
 }
+
+users
+   ↓
+total_users
+
+hospitals
+   ↓
+total_hospitals
+
+ambulance_providers
+   ↓
+total_ambulance_providers
+
+reservations
+   ↓
+total_reservations
+
+# Final flow
+GET /api/v1/admin/dashboard
+        │
+        ▼
+authenticate
+        │
+        ▼
+authorize("SUPER_ADMIN")
+        │
+        ▼
+getAdminDashboard controller
+        │
+        ▼
+getAdminDashboard service
+        │
+        ▼
+getDashboardStats model
+        │
+        ├── COUNT users
+        ├── COUNT hospitals
+        ├── COUNT ambulance_providers
+        └── COUNT reservations
+        │
+        ▼
+Return dashboard response

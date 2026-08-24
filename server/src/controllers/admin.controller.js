@@ -348,6 +348,35 @@ const deleteAmbulanceProvider = async (
     }
 };
 
+// ============================================================
+// GET ADMIN DASHBOARD
+// ============================================================
+
+const getAdminDashboard = async (req, res, next) => {
+    try {
+        const dashboard =
+            await adminService.getAdminDashboard();
+
+        return res.status(200).json({
+            success: true,
+            message: "Admin dashboard fetched successfully",
+            statusCode: 200,
+            data: {
+                totalUsers: Number(dashboard.total_users),
+                totalHospitals: Number(dashboard.total_hospitals),
+                totalAmbulanceProviders: Number(
+                    dashboard.total_ambulance_providers
+                ),
+                totalReservations: Number(
+                    dashboard.total_reservations
+                ),
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 module.exports = {
     getAllUsers,
@@ -363,4 +392,5 @@ module.exports = {
     createAmbulanceProvider,
     updateAmbulanceProvider,
     deleteAmbulanceProvider,
+    getAdminDashboard,
 };

@@ -27,7 +27,9 @@ const {
     getAmbulanceProviderById,
     createAmbulanceProvider,
     updateAmbulanceProvider,
-    deleteAmbulanceProvider
+    deleteAmbulanceProvider,
+
+    getAdminDashboard
 } = require("../controllers/admin.controller");
 
 const {
@@ -38,6 +40,19 @@ const {
 } = require("../validations/admin.validation");
 
 const router = express.Router();
+
+
+// ============================================================
+// SUPER ADMIN DASHBOARD
+// ============================================================
+
+// GET /api/v1/admin/dashboard
+router.get(
+    "/dashboard",
+    authenticate,
+    authorize("SUPER_ADMIN"),
+    getAdminDashboard
+);
 
 // ============================================================
 // USER MANAGEMENT
@@ -169,5 +184,7 @@ router.delete(
     authorize("SUPER_ADMIN"),
     deleteAmbulanceProvider
 );
+
+
 
 module.exports = router;

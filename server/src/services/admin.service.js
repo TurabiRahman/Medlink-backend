@@ -422,6 +422,15 @@ const deleteAmbulanceProvider = async (
     return deletedProvider;
 };
 
+// ============================================================
+// GET ADMIN DASHBOARD
+// ============================================================
+
+const getAdminDashboard = async () => {
+    return await adminModel.getDashboardStats();
+};
+
+
 
 
 module.exports = {
@@ -438,4 +447,5 @@ module.exports = {
     createAmbulanceProvider,
     updateAmbulanceProvider,
     deleteAmbulanceProvider,
+    getAdminDashboard,
 };
