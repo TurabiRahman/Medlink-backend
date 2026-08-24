@@ -560,6 +560,318 @@ const deleteHospital = async (hospitalId) => {
     return result.rows[0];
 };
 
+// ============================================================
+// GET ALL AMBULANCE PROVIDERS
+// ============================================================
+
+const getAllAmbulanceProviders = async ({
+    limit,
+    offset,
+    status,
+}) => {
+    let query = `
+        SELECT
+            ap.id,
+            ap.provider_name,
+            ap.phone,
+            ap.address,
+            ap.latitude,
+            ap.longitude,
+            ap.is_active,
+            ap.created_at,
+            ap.updated_at,
+            COUNT(*) OVER() AS total_count
+        FROM ambulance_providers ap
+        WHERE 1 = 1
+    `;
+
+    const values = [];
+    let parameterIndex = 1;
+
+    if (status !== undefined) {
+        query += `
+            AND ap.is_active = $${parameterIndex}
+        `;
+
+        values.push(status);
+        parameterIndex++;
+    }
+
+    query += `
+        ORDER BY ap.created_at DESC
+        LIMIT $${parameterIndex}
+        OFFSET $${parameterIndex + 1}
+    `;
+
+    values.push(limit, offset);
+
+    const result = await pool.query(query, values);
+
+    return result.rows;
+};
+
+// ============================================================
+// GET AMBULANCE PROVIDER BY ID
+// ============================================================
+
+const getAmbulanceProviderById = async (
+    ambulanceProviderId
+) => {
+    const query = `
+        SELECT
+            ap.id AS ambulance_provider_id,
+            ap.provider_name,
+            ap.phone,
+            ap.address,
+            ap.latitude,
+            ap.longitude,
+            ap.is_active,
+            ap.created_at,
+            ap.updated_at,
+
+            aa.id AS ambulance_admin_id,
+            aa.joined_at,
+
+            u.id AS admin_user_id,
+            u.email AS admin_email,
+            u.phone AS admin_phone,
+            u.is_verified AS admin_is_verified,
+            u.is_active AS admin_is_active
+
+        FROM ambulance_providers ap
+
+        LEFT JOIN ambulance_admins aa
+            ON aa.ambulance_provider_id = ap.id
+
+        LEFT JOIN users u
+            ON u.id = aa.user_id
+
+        WHERE ap.id = $1
+    `;
+
+    const result = await pool.query(query, [
+        ambulanceProviderId,
+    ]);
+
+    return result.rows[0];
+};
+
+// ============================================================
+// CREATE AMBULANCE PROVIDER WITH ADMIN
+// ============================================================
+
+const createAmbulanceProviderWithAdmin = async ({
+    providerName,
+    providerPhone,
+    address,
+    latitude,
+    longitude,
+    isActive,
+    adminEmail,
+    adminPhone,
+    passwordHash,
+}) => {
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN");
+
+        // ----------------------------------------------------
+        // 1. CREATE AMBULANCE PROVIDER
+        // ----------------------------------------------------
+
+        const providerResult = await client.query(
+            `
+            INSERT INTO ambulance_providers (
+                provider_name,
+                phone,
+                address,
+                latitude,
+                longitude,
+                is_active
+            )
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING *
+            `,
+            [
+                providerName,
+                providerPhone,
+                address,
+                latitude,
+                longitude,
+                isActive,
+            ]
+        );
+
+        const ambulanceProvider =
+            providerResult.rows[0];
+
+        // ----------------------------------------------------
+        // 2. CREATE AMBULANCE ADMIN USER
+        // ----------------------------------------------------
+
+        const userResult = await client.query(
+            `
+            INSERT INTO users (
+                role_type,
+                email,
+                phone,
+                password_hash,
+                is_verified,
+                is_active
+            )
+            VALUES (
+                'AMBULANCE_ADMIN',
+                $1,
+                $2,
+                $3,
+                TRUE,
+                TRUE
+            )
+            RETURNING
+                id,
+                role_type,
+                email,
+                phone,
+                is_verified,
+                is_active,
+                created_at
+            `,
+            [
+                adminEmail,
+                adminPhone,
+                passwordHash,
+            ]
+        );
+
+        const adminUser = userResult.rows[0];
+
+        // ----------------------------------------------------
+        // 3. CREATE AMBULANCE ADMIN RELATIONSHIP
+        // ----------------------------------------------------
+
+        const assignmentResult =
+            await client.query(
+                `
+                INSERT INTO ambulance_admins (
+                    ambulance_provider_id,
+                    user_id
+                )
+                VALUES ($1, $2)
+                RETURNING *
+                `,
+                [
+                    ambulanceProvider.id,
+                    adminUser.id,
+                ]
+            );
+
+        const ambulanceAdmin =
+            assignmentResult.rows[0];
+
+        await client.query("COMMIT");
+
+        return {
+            ambulanceProvider,
+            adminUser,
+            ambulanceAdmin,
+        };
+    } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+    } finally {
+        client.release();
+    }
+};
+
+// ============================================================
+// UPDATE AMBULANCE PROVIDER
+// ============================================================
+
+const updateAmbulanceProvider = async (
+    ambulanceProviderId,
+    {
+        providerName,
+        providerPhone,
+        address,
+        latitude,
+        longitude,
+        isActive,
+    }
+) => {
+    const query = `
+        UPDATE ambulance_providers
+        SET
+            provider_name = COALESCE(
+                $1,
+                provider_name
+            ),
+
+            phone = COALESCE(
+                $2,
+                phone
+            ),
+
+            address = COALESCE(
+                $3,
+                address
+            ),
+
+            latitude = COALESCE(
+                $4,
+                latitude
+            ),
+
+            longitude = COALESCE(
+                $5,
+                longitude
+            ),
+
+            is_active = COALESCE(
+                $6,
+                is_active
+            )
+
+        WHERE id = $7
+
+        RETURNING *
+    `;
+
+    const result = await pool.query(query, [
+        providerName,
+        providerPhone,
+        address,
+        latitude,
+        longitude,
+        isActive,
+        ambulanceProviderId,
+    ]);
+
+    return result.rows[0];
+};
+
+// ============================================================
+// DELETE AMBULANCE PROVIDER
+// ============================================================
+
+const deleteAmbulanceProvider = async (
+    ambulanceProviderId
+) => {
+    const query = `
+        DELETE FROM ambulance_providers
+        WHERE id = $1
+        RETURNING *
+    `;
+
+    const result = await pool.query(query, [
+        ambulanceProviderId,
+    ]);
+
+    return result.rows[0];
+};
+
+
+
 module.exports = {
     getAllUsers,
     countUsers,
@@ -574,4 +886,9 @@ module.exports = {
     assignHospitalAdmin,
     updateHospital,
     deleteHospital,
+    getAllAmbulanceProviders,
+    getAmbulanceProviderById,
+    createAmbulanceProviderWithAdmin,
+    updateAmbulanceProvider,
+    deleteAmbulanceProvider,
 };

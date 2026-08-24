@@ -46,6 +46,45 @@ POST   /api/v1/admin/ambulance-providers
 PUT    /api/v1/admin/ambulance-providers/:ambulanceProviderId
 DELETE /api/v1/admin/ambulance-providers/:ambulanceProviderId
 
+ambulance_providers
+       │
+       │ provider_id
+       ▼
+ambulance_admins
+       │
+       │ user_id
+       ▼
+users
+
+# for post method 
+
+Super Admin creates Ambulance Provider
+        │
+        ├── 1. Create ambulance_providers record
+        │        ↓
+        │     ambulance_provider_id
+        │
+        ├── 2. Hash admin password
+        │
+        ├── 3. Create users record
+        │        role_type = AMBULANCE_ADMIN
+        │        ↓
+        │     user_id
+        │
+        └── 4. Create ambulance_admins relationship
+                 ambulance_provider_id
+                 user_id
+
+# for delete method
+
+ambulance_providers row
+        ↓ CASCADE
+ambulance_admins row
+
+But the associated users row remains.
+
+That behavior is intentional for now
+recommend not automatically deleting the user account, because deleting a user is more destructive and that user may have related data or may later need to be reassigned.
 
 # Phase 6.4 — Super Admin Dashboard
 

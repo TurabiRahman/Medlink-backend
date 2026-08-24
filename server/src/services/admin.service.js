@@ -245,6 +245,185 @@ const deleteHospital = async (hospitalId) => {
     );
 };
 
+// ============================================================
+// GET ALL AMBULANCE PROVIDERS
+// ============================================================
+
+const getAllAmbulanceProviders = async ({
+    limit = 50,
+    offset = 0,
+    status,
+}) => {
+    const parsedLimit = Math.min(
+        Math.max(Number(limit) || 50, 1),
+        100
+    );
+
+    const parsedOffset = Math.max(
+        Number(offset) || 0,
+        0
+    );
+
+    let isActive;
+
+    if (status !== undefined) {
+        const normalizedStatus =
+            String(status).toLowerCase();
+
+        if (normalizedStatus === "active") {
+            isActive = true;
+        } else if (normalizedStatus === "inactive") {
+            isActive = false;
+        } else {
+            const error = new Error(
+                "Status must be either active or inactive"
+            );
+
+            error.statusCode = 400;
+            throw error;
+        }
+    }
+
+    const providers =
+        await adminModel.getAllAmbulanceProviders({
+            limit: parsedLimit,
+            offset: parsedOffset,
+            status: isActive,
+        });
+
+    const total =
+        providers.length > 0
+            ? Number(providers[0].total_count)
+            : 0;
+
+    const data = providers.map(
+        ({ total_count, ...provider }) => provider
+    );
+
+    return {
+        total,
+        limit: parsedLimit,
+        offset: parsedOffset,
+        providers: data,
+    };
+};
+
+// ============================================================
+// GET AMBULANCE PROVIDER DETAILS
+// ============================================================
+
+const getAmbulanceProviderById = async (
+    ambulanceProviderId
+) => {
+    const provider =
+        await adminModel.getAmbulanceProviderById(
+            ambulanceProviderId
+        );
+
+    if (!provider) {
+        const error = new Error(
+            "Ambulance provider not found"
+        );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    return provider;
+};
+
+// ============================================================
+// CREATE AMBULANCE PROVIDER
+// ============================================================
+
+const createAmbulanceProvider = async ({
+    providerName,
+    providerPhone,
+    address,
+    latitude,
+    longitude,
+    isActive = true,
+
+    adminEmail,
+    adminPhone,
+    password,
+}) => {
+    const passwordHash = await bcrypt.hash(
+        password,
+        12
+    );
+
+    return await adminModel
+        .createAmbulanceProviderWithAdmin({
+            providerName,
+            providerPhone,
+            address,
+            latitude,
+            longitude,
+            isActive,
+            adminEmail,
+            adminPhone,
+            passwordHash,
+        });
+};
+
+// ============================================================
+// UPDATE AMBULANCE PROVIDER
+// ============================================================
+
+const updateAmbulanceProvider = async (
+    ambulanceProviderId,
+    updateData
+) => {
+    const existingProvider =
+        await adminModel.getAmbulanceProviderById(
+            ambulanceProviderId
+        );
+
+    if (!existingProvider) {
+        const error = new Error(
+            "Ambulance provider not found"
+        );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    return await adminModel.updateAmbulanceProvider(
+        ambulanceProviderId,
+        updateData
+    );
+};
+
+// ============================================================
+// DELETE AMBULANCE PROVIDER
+// ============================================================
+
+const deleteAmbulanceProvider = async (
+    ambulanceProviderId
+) => {
+    const deletedProvider =
+        await adminModel.deleteAmbulanceProvider(
+            ambulanceProviderId
+        );
+
+    if (!deletedProvider) {
+        const error = new Error(
+            "Ambulance provider not found"
+        );
+
+        error.statusCode = 404;
+
+        throw error;
+    }
+
+    return deletedProvider;
+};
+
+
+
 module.exports = {
     getAllUsers,
     updateUserRole,
@@ -254,4 +433,9 @@ module.exports = {
     createHospital,
     updateHospital,
     deleteHospital,
+    getAllAmbulanceProviders,
+    getAmbulanceProviderById,
+    createAmbulanceProvider,
+    updateAmbulanceProvider,
+    deleteAmbulanceProvider,
 };

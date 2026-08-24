@@ -21,7 +21,13 @@ const {
     getHospitalById,
     createHospital,
     updateHospital,
-    deleteHospital
+    deleteHospital,
+
+    getAllAmbulanceProviders,
+    getAmbulanceProviderById,
+    createAmbulanceProvider,
+    updateAmbulanceProvider,
+    deleteAmbulanceProvider
 } = require("../controllers/admin.controller");
 
 const {
@@ -113,6 +119,55 @@ router.delete(
     authenticate,
     authorize("SUPER_ADMIN"),
     deleteHospital
+);
+
+// ============================================================
+// AMBULANCE PROVIDER MANAGEMENT
+// ============================================================
+
+
+// GET /api/v1/admin/ambulance-providers
+router.get(
+    "/ambulance-providers",
+    authenticate,
+    authorize("SUPER_ADMIN"),
+    getAllAmbulanceProviders
+);
+
+
+// GET /api/v1/admin/ambulance-providers/:ambulanceProviderId
+router.get(
+    "/ambulance-providers/:ambulanceProviderId",
+    authenticate,
+    authorize("SUPER_ADMIN"),
+    getAmbulanceProviderById
+);
+
+
+// POST /api/v1/admin/ambulance-providers
+router.post(
+    "/ambulance-providers",
+    authenticate,
+    authorize("SUPER_ADMIN"),
+    createAmbulanceProvider
+);
+
+
+// PUT /api/v1/admin/ambulance-providers/:ambulanceProviderId
+router.put(
+    "/ambulance-providers/:ambulanceProviderId",
+    authenticate,
+    authorize("SUPER_ADMIN"),
+    updateAmbulanceProvider
+);
+
+
+// DELETE /api/v1/admin/ambulance-providers/:ambulanceProviderId
+router.delete(
+    "/ambulance-providers/:ambulanceProviderId",
+    authenticate,
+    authorize("SUPER_ADMIN"),
+    deleteAmbulanceProvider
 );
 
 module.exports = router;

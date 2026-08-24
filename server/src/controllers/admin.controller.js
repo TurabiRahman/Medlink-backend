@@ -208,6 +208,147 @@ const deleteHospital = async (req, res, next) => {
     }
 };
 
+// ============================================================
+// GET ALL AMBULANCE PROVIDERS
+// ============================================================
+
+const getAllAmbulanceProviders = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const result =
+            await adminService.getAllAmbulanceProviders(
+                req.query
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Ambulance providers fetched successfully",
+            statusCode: 200,
+            total: result.total,
+            limit: result.limit,
+            offset: result.offset,
+            count: result.providers.length,
+            data: result.providers,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// GET AMBULANCE PROVIDER BY ID
+// ============================================================
+
+const getAmbulanceProviderById = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const provider =
+            await adminService.getAmbulanceProviderById(
+                req.params.ambulanceProviderId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Ambulance provider details fetched successfully",
+            statusCode: 200,
+            data: provider,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// CREATE AMBULANCE PROVIDER
+// ============================================================
+
+const createAmbulanceProvider = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const result =
+            await adminService.createAmbulanceProvider(
+                req.body
+            );
+
+        return res.status(201).json({
+            success: true,
+            message:
+                "Ambulance provider registered successfully",
+            statusCode: 201,
+            data: result,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// UPDATE AMBULANCE PROVIDER
+// ============================================================
+
+const updateAmbulanceProvider = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const provider =
+            await adminService.updateAmbulanceProvider(
+                req.params.ambulanceProviderId,
+                req.body
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Ambulance provider updated successfully",
+            statusCode: 200,
+            data: provider,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ============================================================
+// DELETE AMBULANCE PROVIDER
+// ============================================================
+
+const deleteAmbulanceProvider = async (
+    req,
+    res,
+    next
+) => {
+    try {
+        const provider =
+            await adminService.deleteAmbulanceProvider(
+                req.params.ambulanceProviderId
+            );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Ambulance provider deleted successfully",
+            statusCode: 200,
+            data: provider,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 module.exports = {
     getAllUsers,
     updateUserRole,
@@ -217,4 +358,9 @@ module.exports = {
     createHospital,
     updateHospital,
     deleteHospital,
+    getAllAmbulanceProviders,
+    getAmbulanceProviderById,
+    createAmbulanceProvider,
+    updateAmbulanceProvider,
+    deleteAmbulanceProvider,
 };
