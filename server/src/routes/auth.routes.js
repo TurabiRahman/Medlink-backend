@@ -2,7 +2,7 @@ const express = require("express");
 
 const authController = require("../controllers/auth.controller");
 const validate = require("../middlewares/validate.middleware");
-const { signupSchema, loginSchema, emergencyLoginSchema } = require("../validations/auth.validation");
+const { signupSchema, loginSchema, emergencyLoginSchema, forgotPasswordSchema, resetPasswordSchema } = require("../validations/auth.validation");
 
 const authenticate = require("../middlewares/auth.middleware");
 
@@ -26,6 +26,17 @@ router.post(
     authController.startEmergencySession
 );
 
+router.post(
+    "/forgot-password",
+    validate(forgotPasswordSchema),
+    authController.forgotPassword
+);
+
+router.post(
+    "/reset-password",
+    validate(resetPasswordSchema),
+    authController.resetPassword
+);
 
 router.post(
     "/logout",

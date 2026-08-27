@@ -151,6 +151,52 @@ const createEmergencyUser = async ({
     return result.rows[0];
 };
 
+/**
+ * Update user password
+ */
+const updateUserPassword = async ({
+    userId,
+    passwordHash,
+}) => {
+    const query = `
+        UPDATE users
+        SET
+            password_hash = $2
+        WHERE id = $1
+        RETURNING
+            id,
+            email,
+            phone,
+            updated_at;
+    `;
+
+    const result = await pool.query(query, [
+        userId,
+        passwordHash,
+    ]);
+
+    return result.rows[0];
+};
+
+/**
+ * Find a user by ID
+ */
+const findUserById = async (userId) => {
+
+    const query = `
+        SELECT *
+        FROM users
+        WHERE id = $1
+        LIMIT 1;
+    `;
+
+    const { rows } = await pool.query(
+        query,
+        [userId]
+    );
+
+    return rows[0];
+};
 
 module.exports = {
   findUserByEmail,
@@ -159,4 +205,6 @@ module.exports = {
   updateLastLogin,
   hasUserProfile,
   createEmergencyUser,
+  updateUserPassword,
+  findUserById,
 };

@@ -188,9 +188,96 @@ const startEmergencySession = async (req, res) => {
     }
 };
 
+const forgotPassword = async (req, res) => {
+
+    try {
+
+        const result = await authService.forgotPassword(
+            req.body
+        );
+
+        const response = {
+            success: true,
+            message:
+                "If an account with this email exists, password reset instructions have been generated.",
+            statusCode: 200,
+        };
+
+        /*
+         * DEVELOPMENT / POSTMAN TESTING ONLY
+         *
+         * In production, this token should be
+         * sent through email instead.
+         */
+        if (
+            process.env.NODE_ENV !== "production" &&
+            result.resetToken
+        ) {
+            response.data = {
+                resetToken: result.resetToken,
+            };
+        }
+
+        return res.status(200).json(response);
+
+    } catch (error) {
+
+        return res.status(
+            error.statusCode || 500
+        ).json({
+            success: false,
+            message:
+                error.message ||
+                "Internal Server Error",
+            statusCode:
+                error.statusCode || 500,
+
+            ...(error.errorCode && {
+                errorCode: error.errorCode,
+            }),
+        });
+    }
+};
+
+const resetPassword = async (req, res) => {
+
+    try {
+
+        await authService.resetPassword(
+            req.body
+        );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "Password reset successfully",
+            statusCode: 200,
+        });
+
+    } catch (error) {
+
+        return res.status(
+            error.statusCode || 500
+        ).json({
+            success: false,
+            message:
+                error.message ||
+                "Internal Server Error",
+            statusCode:
+                error.statusCode || 500,
+
+            ...(error.errorCode && {
+                errorCode: error.errorCode,
+            }),
+        });
+    }
+};
+
 module.exports = {
   signup,
   login,
   startEmergencySession,
   logout,
+  forgotPassword,
+  resetPassword,
 };

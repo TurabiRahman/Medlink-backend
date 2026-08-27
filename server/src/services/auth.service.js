@@ -8,11 +8,15 @@ const {
   updateLastLogin,
   hasUserProfile,
   createEmergencyUser,
+  updateUserPassword,
+  findUserById,
 } = require("../models/auth.model");
 
 const {
   generateAccessToken,
   generateRefreshToken,
+  generatePasswordResetToken,
+  verifyPasswordResetToken,
 } = require("../utils/jwt");
 
 const {
@@ -323,9 +327,124 @@ const logout = async () => {
     return true;
 };
 
+const forgotPassword = async ({ email }) => {
+
+    const user = await findUserByEmail(email);
+
+    /*
+     * Security:
+     * Do not reveal whether an email exists.
+     */
+    if (!user) {
+        return {
+            resetToken: null,
+        };
+    }
+
+    /*
+     * Do not allow password reset
+     * for deactivated accounts.
+     */
+    if (!user.is_active) {
+        return {
+            resetToken: null,
+        };
+    }
+
+    const payload = {
+        userId: user.id,
+        purpose: "PASSWORD_RESET",
+    };
+
+    const resetToken = generatePasswordResetToken(payload);
+
+    return {
+        resetToken,
+    };
+};
+
+const resetPassword = async ({
+    resetToken,
+    newPassword,
+}) => {
+
+    let decoded;
+
+    try {
+
+        decoded = verifyPasswordResetToken(resetToken);
+
+    } catch (error) {
+
+        const err = new Error(
+            "Invalid or expired password reset token"
+        );
+
+        err.statusCode = 401;
+        err.errorCode = "INVALID_RESET_TOKEN";
+
+        throw err;
+    }
+
+    /*
+     * Extra protection:
+     * This token must specifically be
+     * a password reset token.
+     */
+    if (decoded.purpose !== "PASSWORD_RESET") {
+
+        const err = new Error(
+            "Invalid password reset token"
+        );
+
+        err.statusCode = 401;
+        err.errorCode = "INVALID_RESET_TOKEN";
+
+        throw err;
+    }
+
+    const user = await findUserById(decoded.userId);
+
+    if (!user) {
+
+        const err = new Error("User not found");
+
+        err.statusCode = 404;
+        err.errorCode = "USER_NOT_FOUND";
+
+        throw err;
+    }
+
+    if (!user.is_active) {
+
+        const err = new Error(
+            "Account has been deactivated"
+        );
+
+        err.statusCode = 403;
+        err.errorCode = "ACCOUNT_DISABLED";
+
+        throw err;
+    }
+
+    const passwordHash = await bcrypt.hash(
+        newPassword,
+        12
+    );
+
+    const updatedUser = await updateUserPassword({
+        userId: user.id,
+        passwordHash,
+    });
+
+    return updatedUser;
+};
+
 module.exports = {
   signup,
   login,
   startEmergencySession,
   logout,
+  forgotPassword,
+  resetPassword,
 };

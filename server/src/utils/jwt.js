@@ -33,6 +33,20 @@ const generateRefreshToken = (payload) => {
 };
 
 
+/**
+ * Generate Password Reset Token
+ */
+const generatePasswordResetToken = (payload) => {
+    return jwt.sign(
+        payload,
+        process.env.JWT_PASSWORD_RESET_SECRET,
+        {
+            expiresIn: process.env.JWT_PASSWORD_RESET_EXPIRES_IN,
+        }
+    );
+};
+
+
 
 /**
  * Verify Access Token
@@ -61,10 +75,23 @@ const verifyRefreshToken = (token) => {
 };
 
 
+/**
+ * Verify Password Reset Token
+ */
+const verifyPasswordResetToken = (token) => {
+    return jwt.verify(
+        token,
+        process.env.JWT_PASSWORD_RESET_SECRET
+    );
+};
+
+
 
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
   verifyAccessToken,
   verifyRefreshToken,
+  generatePasswordResetToken,
+  verifyPasswordResetToken
 };
