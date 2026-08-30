@@ -14,6 +14,7 @@ const hospitalAdminRoutes = require("./routes/hospital-admin.routes");
 const paymentRoutes = require("./routes/payment.routes");
 const ambulanceAdminRoutes = require("./routes/ambulance-admin.routes");
 const adminRoutes = require("./routes/admin.routes");
+const bloodRoutes = require("./routes/blood.routes");
 
 
 
@@ -35,6 +36,7 @@ app.use("/api/v1/hospital",hospitalAdminRoutes);
 app.use("/api/v1/payments", paymentRoutes);
 app.use("/api/v1/ambulances", ambulanceAdminRoutes);
 app.use("/api/v1/admin", adminRoutes);
+app.use("/api/v1/blood", bloodRoutes);
 
 
 
