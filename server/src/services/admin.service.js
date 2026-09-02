@@ -430,7 +430,18 @@ const getAdminDashboard = async () => {
     return await adminModel.getDashboardStats();
 };
 
+const getUserDetails = async (userId) => {
+  const user = await adminModel.getUserDetailsById(userId);
 
+  if (!user) {
+    const error = new Error("User not found");
+    error.statusCode = 404;
+
+    throw error;
+  }
+
+  return user;
+};
 
 
 module.exports = {
@@ -448,4 +459,5 @@ module.exports = {
     updateAmbulanceProvider,
     deleteAmbulanceProvider,
     getAdminDashboard,
+    getUserDetails,
 };

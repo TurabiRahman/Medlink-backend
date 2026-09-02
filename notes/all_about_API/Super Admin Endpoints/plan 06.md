@@ -154,3 +154,5 @@ getDashboardStats model
         │
         ▼
 Return dashboard response
+
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlZmU2MTAzYS1lOTg5LTRiZDctODk2Ny1lODNkMWU3MDAxZTIiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3ODgzMzcwNTIsImV4cCI6MTc4ODUwOTg1Mn0.Wyeerpzup7GEJSNYmZyGcxyc6Wq8dTQdeseX9aSMYBo

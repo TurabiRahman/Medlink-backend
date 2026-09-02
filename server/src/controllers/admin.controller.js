@@ -377,6 +377,22 @@ const getAdminDashboard = async (req, res, next) => {
     }
 };
 
+const getUserDetailsController = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await adminService.getUserDetails(userId);
+
+    return res.status(200).json({
+      success: true,
+      message: "User details fetched successfully",
+      statusCode: 200,
+      data: user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
     getAllUsers,
@@ -393,4 +409,5 @@ module.exports = {
     updateAmbulanceProvider,
     deleteAmbulanceProvider,
     getAdminDashboard,
+    getUserDetailsController,
 };

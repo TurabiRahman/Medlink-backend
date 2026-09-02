@@ -29,14 +29,17 @@ const {
     updateAmbulanceProvider,
     deleteAmbulanceProvider,
 
-    getAdminDashboard
+    getAdminDashboard,
+
+    getUserDetailsController
 } = require("../controllers/admin.controller");
 
 const {
     updateUserRoleSchema,
     updateUserStatusSchema,
     createHospitalSchema,
-    updateHospitalSchema
+    updateHospitalSchema,
+    userIdParamSchema
 } = require("../validations/admin.validation");
 
 const router = express.Router();
@@ -66,6 +69,13 @@ router.get(
     getAllUsers
 );
 
+router.get(
+  "/users/:userId",
+  authenticate,
+  authorize("SUPER_ADMIN"),
+  validate(userIdParamSchema, "params"),
+  getUserDetailsController
+);
 
 // PUT /api/v1/admin/users/:userId/role
 router.put(
